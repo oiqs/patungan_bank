@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 const INITIAL_TAGIHAN = [
-  { id: 't-okt26', bln: 'Okt', thn: '2026', judul: 'Iuran Wajib Oktober 2026', nominal: 10000, jatuhTempo: '20 Okt 2026', status: 'belum', telat: true },
   { id: 't-nov26', bln: 'Nov', thn: '2026', judul: 'Iuran Wajib November 2026', nominal: 10000, jatuhTempo: '20 Nov 2026', status: 'belum', telat: false },
+  { id: 't-okt26', bln: 'Okt', thn: '2026', judul: 'Iuran Wajib Oktober 2026', nominal: 10000, jatuhTempo: '20 Okt 2026', status: 'belum', telat: true },
   { id: 't-sep26', bln: 'Sep', thn: '2026', judul: 'Iuran Wajib September 2026', nominal: 10000, jatuhTempo: '20 Sep 2026', status: 'lunas', telat: false },
   { id: 't-agu26', bln: 'Agu', thn: '2026', judul: 'Iuran Wajib Agustus 2026', nominal: 10000, jatuhTempo: '20 Agu 2026', status: 'lunas', telat: false },
   { id: 't-jul26', bln: 'Jul', thn: '2026', judul: 'Iuran Wajib Juli 2026', nominal: 10000, jatuhTempo: '20 Jul 2026', status: 'pending', telat: false },
@@ -120,10 +120,6 @@ export const useBankStore = create(
         currentUser: { ...state.currentUser, fingerprintAktif: !state.currentUser.fingerprintAktif }
       })),
 
-      // --- PENGATURAN MODE DEMO / DOSEN ---
-      isDemoMode: false,
-      toggleDemoMode: () => set((state) => ({ isDemoMode: !state.isDemoMode })),
-
       // --- KEUANGAN UTAMA ---
       dompetSaldo: 125000,
       kasSaldo: 4820000,
@@ -232,10 +228,10 @@ export const useBankStore = create(
 
       // --- NOTIFIKASI ---
       notifikasi: [
-        { id: 'n1', judul: '⏰ Pengingat Tagihan Iuran', pesan: 'Iuran wajib November sebesar Rp 10.000 jatuh tempo pada 20 Nov 2026.', tgl: '16 Nov 2026, 08:00', dibaca: false, link: '/kas' },
-        { id: 'n2', judul: '📢 Undangan Rapat Tarunesha', pesan: 'Rapat koordinasi bulanan akan diadakan pada Jumat, 20 Nov di Balai RW 05 pukul 19:00.', tgl: '15 Nov 2026, 14:00', dibaca: false, link: '/' },
-        { id: 'n3', judul: '🎲 Hasil Arisan Oktober', pesan: 'Selamat kepada Dewi Lestari yang memenangkan arisan periode Oktober 2026 sebesar Rp 500.000.', tgl: '1 Nov 2026, 20:00', dibaca: true, link: '/layanan/arisan' },
-        { id: 'n4', judul: '✅ Verifikasi Pembayaran Berhasil', pesan: 'Pembayaran iuran September Anda telah diverifikasi oleh Bendahara.', tgl: '12 Sep 2026, 10:15', dibaca: true, link: '/kas' },
+        { id: 'n1', judul: 'Pengingat Tagihan Iuran', pesan: 'Iuran wajib November sebesar Rp 10.000 jatuh tempo pada 20 Nov 2026.', tgl: '16 Nov 2026, 08:00', dibaca: false, link: '/kas' },
+        { id: 'n2', judul: 'Undangan Rapat Tarunesha', pesan: 'Rapat koordinasi bulanan akan diadakan pada Jumat, 20 Nov di Balai RW 05 pukul 19:00.', tgl: '15 Nov 2026, 14:00', dibaca: false, link: '/' },
+        { id: 'n3', judul: 'Hasil Arisan Oktober', pesan: 'Selamat kepada Dewi Lestari yang memenangkan arisan periode Oktober 2026 sebesar Rp 500.000.', tgl: '1 Nov 2026, 20:00', dibaca: true, link: '/layanan/arisan' },
+        { id: 'n4', judul: 'Verifikasi Pembayaran Berhasil', pesan: 'Pembayaran iuran September Anda telah diverifikasi oleh Bendahara.', tgl: '12 Sep 2026, 10:15', dibaca: true, link: '/kas' },
       ],
 
       // --- AI ASSISTANT MODAL STATE ---
@@ -260,7 +256,7 @@ export const useBankStore = create(
         }
         const notif = {
           id: `n-${Date.now()}`,
-          judul: '💰 Top-Up Berhasil',
+          judul: 'Top-Up Berhasil',
           pesan: `Saldo dompet Anda bertambah Rp ${Number(nominal).toLocaleString('id-ID')} via ${metode}.`,
           tgl: 'Baru saja',
           dibaca: false,
@@ -318,7 +314,7 @@ export const useBankStore = create(
 
         const notif = {
           id: `n-${Date.now()}`,
-          judul: '✅ Iuran Berhasil Dibayar',
+          judul: 'Iuran Berhasil Dibayar',
           pesan: `${target.judul} sebesar Rp ${nominal.toLocaleString('id-ID')} berhasil lunas!`,
           tgl: 'Baru saja',
           dibaca: false,
@@ -509,7 +505,7 @@ export const useBankStore = create(
         }
         const notif = {
           id: `n-${Date.now()}`,
-          judul: '📋 Pengajuan Pinjaman Terkirim',
+          judul: 'Pengajuan Pinjaman Terkirim',
           pesan: `Pengajuan pinjaman Rp ${Number(data.nominal).toLocaleString('id-ID')} sedang diverifikasi Bendahara.`,
           tgl: 'Baru saja',
           dibaca: false,
@@ -565,7 +561,7 @@ export const useBankStore = create(
         }
         const notif = {
           id: `n-${Date.now()}`,
-          judul: '🎉 Pemenang Arisan November!',
+          judul: 'Pemenang Arisan Terpilih!',
           pesan: `Selamat kepada ${pemenangNama} yang memenangkan pot arisan sebesar Rp ${(jumlah || state.arisan.pot).toLocaleString('id-ID')}.`,
           tgl: 'Baru saja',
           dibaca: false,

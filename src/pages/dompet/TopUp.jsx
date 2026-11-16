@@ -1,26 +1,37 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  ArrowLeft,
+  Landmark,
+  Building2,
+  QrCode,
+  Store,
+  Wallet,
+  CheckCircle2,
+  Check,
+  Copy,
+  Zap,
+} from 'lucide-react'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
 import { rp, shortRp } from '../../lib/format'
 import { useBankStore } from '../../store/useBankStore'
-import { ArrowLeft, Copy, CheckCircle2, Building2, QrCode, Store } from 'lucide-react'
 
 const metodeList = [
-  { id: 'bca', nama: 'BCA Virtual Account', icon: Building2, va: '8219-0812-3456-7890' },
+  { id: 'bca', nama: 'BCA Virtual Account', icon: Landmark, va: '8219-0812-3456-7890' },
   { id: 'bri', nama: 'BRI Virtual Account (BRIVA)', icon: Building2, va: '7721-0812-3456-7890' },
   { id: 'qris', nama: 'QRIS Instan', icon: QrCode, va: 'Scan QRIS Dinamis' },
-  { id: 'alfa', nama: 'Alfamart / Indomaret', icon: Store, va: 'KODE TRN-992102' },
+  { id: 'alfa', nama: 'Alfamart / Indomaret', icon: Store, va: 'KODE: TRN-992102' },
 ]
 
-const quickNominal = [20000, 50000, 100000, 200000]
+const quickNominal = [50000, 100000, 200000, 500000]
 
 export default function TopUp() {
   const navigate = useNavigate()
   const { dompetSaldo, topupDompet } = useBankStore()
 
   const [selectedMetode, setSelectedMetode] = useState(metodeList[0])
-  const [nominal, setNominal] = useState(50000)
+  const [nominal, setNominal] = useState(100000)
   const [customInput, setCustomInput] = useState('')
   const [salinStatus, setSalinStatus] = useState(false)
   const [sukses, setSukses] = useState(false)
@@ -30,7 +41,7 @@ export default function TopUp() {
   const handleSalin = () => {
     navigator.clipboard?.writeText(selectedMetode.va)
     setSalinStatus(true)
-    setTimeout(() => setSalinStatus(false), 2000)
+    setTimeout(() => setSalinStatus(false), 1500)
   }
 
   const handleProsesTopUp = () => {
@@ -43,146 +54,163 @@ export default function TopUp() {
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#F4F7F5] overflow-y-auto no-scrollbar pb-24">
+    <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12 pb-24">
       {/* Header */}
-      <div className="bg-white px-4 py-3.5 border-b border-[#E2EBE7] flex items-center gap-2 sticky top-0 z-10 pt-12">
+      <div className="bg-white px-5 py-4 border-b border-[#E2EBE7] flex items-center gap-3 sticky top-0 z-10 shadow-xs">
         <button
           onClick={() => navigate(-1)}
-          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-[#1A6B4A] hover:bg-[#E6F4EE] active:scale-95 transition-all"
-          aria-label="Kembali"
+          className="text-[#1A6B4A] active:scale-95 transition-transform"
+          title="Kembali"
         >
-          <ArrowLeft size={22} />
+          <ArrowLeft className="w-5 h-5 stroke-[2]" />
         </button>
-        <h1 className="text-[#111F1A] font-bold text-base flex-1">Isi Saldo Dompet</h1>
+        <h1 className="text-[#111F1A] font-bold text-base flex-1">Isi Saldo Dompet (Top-Up)</h1>
       </div>
 
-      <div className="px-4 py-4 space-y-4">
+      <div className="p-4 space-y-4">
         {sukses ? (
-          <div className="bg-white rounded-3xl p-8 text-center flex flex-col items-center gap-4 my-8 shadow-xs">
-            <div className="w-16 h-16 rounded-full bg-[#E6F4EE] text-[#1A6B4A] flex items-center justify-center">
-              <CheckCircle2 size={36} />
+          <div className="bg-white rounded-3xl p-8 text-center flex flex-col items-center gap-4 my-8 shadow-sm">
+            <div className="w-16 h-16 rounded-full bg-[#E6F4EE] flex items-center justify-center text-[#1A6B4A] shadow-md animate-bounce">
+              <CheckCircle2 className="w-10 h-10 stroke-[2]" />
             </div>
-            <h2 className="text-xl font-black text-[#111F1A]">Top-Up Berhasil!</h2>
-            <p className="text-sm text-[#456355]">
+            <h2 className="text-xl font-bold text-[#111F1A]">Top-Up Berhasil!</h2>
+            <p className="text-xs text-[#4A6358]">
               Saldo dompet Anda berhasil bertambah <strong>{rp(activeNominal)}</strong>.
             </p>
+            <span className="text-xs text-[#1A6B4A] font-bold bg-[#E6F4EE] px-4 py-1.5 rounded-full">
+              Saldo Sekarang: {rp(dompetSaldo + activeNominal)}
+            </span>
           </div>
         ) : (
-          <div className="space-y-4">
+          <>
             {/* Saldo Saat Ini */}
-            <Card className="p-4 bg-white border border-[#D5E2DC]">
-              <span className="text-xs font-bold text-[#5F7A6E]">Saldo Dompet Anda Saat Ini</span>
-              <p className="text-2xl font-black text-[#1A6B4A] mt-0.5">{rp(dompetSaldo)}</p>
-            </Card>
+            <div className="bg-gradient-to-r from-[#0D4A33] to-[#1A6B4A] rounded-2xl p-4 text-white flex items-center justify-between">
+              <div>
+                <p className="text-xs text-white/70 font-semibold">Saldo Dompet Saat Ini</p>
+                <p className="text-2xl font-extrabold mt-0.5">{rp(dompetSaldo)}</p>
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-white/15 flex items-center justify-center text-white">
+                <Wallet className="w-6 h-6 stroke-[2]" />
+              </div>
+            </div>
 
             {/* Pilihan Nominal Cepat */}
             <div>
-              <h3 className="text-sm font-bold text-[#111F1A] mb-2 px-1">
+              <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2 px-1">
                 Pilih Nominal Top-Up
-              </h3>
-              <div className="grid grid-cols-2 gap-2.5">
+              </p>
+              <div className="grid grid-cols-2 gap-2 mb-2">
                 {quickNominal.map((n) => (
                   <button
                     key={n}
                     type="button"
-                    onClick={() => {
-                      setNominal(n)
-                      setCustomInput('')
-                    }}
+                    onClick={() => { setNominal(n); setCustomInput('') }}
                     className={`py-3 px-4 rounded-xl border text-sm font-bold transition-all ${
                       activeNominal === n && !customInput
-                        ? 'bg-[#1A6B4A] text-white border-[#1A6B4A]'
-                        : 'bg-white text-[#2D4539] border-[#D5E2DC]'
+                        ? 'bg-[#1A6B4A] text-white border-[#1A6B4A] shadow-sm'
+                        : 'bg-white text-[#111F1A] border-[#E2EBE7]'
                     }`}
                   >
-                    {rp(n)}
+                    {shortRp(n)}
                   </button>
                 ))}
               </div>
-            </div>
 
-            {/* Nominal Kustom */}
-            <div>
-              <label className="text-sm font-bold text-[#111F1A] block mb-1 px-1">
-                Atau Ketik Nominal Lain (Rp)
-              </label>
+              {/* Input Custom */}
               <input
                 type="number"
-                placeholder="Minimal Rp 10.000"
+                placeholder="Atau ketik nominal lainnya (min. Rp 10.000)"
                 value={customInput}
                 onChange={e => setCustomInput(e.target.value)}
-                className="w-full border border-[#D5E2DC] rounded-xl px-4 py-3 text-base font-bold bg-white text-[#111F1A] focus:outline-none focus:border-[#1A6B4A]"
+                className="w-full border border-[#E2EBE7] rounded-xl px-4 py-3 text-xs bg-white focus:outline-none focus:border-[#1A6B4A]"
               />
             </div>
 
-            {/* Pilihan Metode Transfer */}
+            {/* Pilihan Metode Pembayaran */}
             <div>
-              <h3 className="text-sm font-bold text-[#111F1A] mb-2 px-1">
-                Pilih Kanal Pembayaran
-              </h3>
+              <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2 px-1">
+                Metode Pembayaran
+              </p>
               <div className="space-y-2">
                 {metodeList.map((m) => {
                   const Icon = m.icon
-                  const isSelected = selectedMetode.id === m.id
                   return (
-                    <div
+                    <Card
                       key={m.id}
                       onClick={() => setSelectedMetode(m)}
-                      className={`p-3.5 rounded-2xl border-2 flex items-center justify-between cursor-pointer transition-all ${
-                        isSelected
-                          ? 'border-[#1A6B4A] bg-[#E6F4EE]'
-                          : 'border-[#E2EBE7] bg-white'
+                      className={`p-3.5 flex items-center gap-3 cursor-pointer transition-all ${
+                        selectedMetode.id === m.id
+                          ? 'border-2 border-[#1A6B4A] bg-[#E8F4EE]/40'
+                          : 'border border-[#E2EBE7]'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-white border border-[#E2EBE7] flex items-center justify-center text-[#1A6B4A]">
-                          <Icon size={20} />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-[#111F1A]">{m.nama}</p>
-                          <p className="text-xs text-[#5F7A6E] mt-0.5">{m.va}</p>
-                        </div>
+                      <div className="w-10 h-10 rounded-xl bg-[#EBF7F1] text-[#1A6B4A] flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-5 h-5 stroke-[2]" />
                       </div>
-                      <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        isSelected ? 'border-[#1A6B4A] bg-[#1A6B4A]' : 'border-[#D5E2DC]'
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-[#111F1A]">{m.nama}</p>
+                        <p className="text-xs text-[#8FA89E] font-mono mt-0.5">{m.va}</p>
+                      </div>
+                      <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${
+                        selectedMetode.id === m.id ? 'border-[#1A6B4A] bg-[#1A6B4A]' : 'border-[#C0CCC8]'
                       }`}>
-                        {isSelected && <span className="w-2 h-2 rounded-full bg-white" />}
-                      </span>
-                    </div>
+                        {selectedMetode.id === m.id && <Check className="w-3 h-3 text-white stroke-[2.5]" />}
+                      </div>
+                    </Card>
                   )
                 })}
               </div>
             </div>
 
-            {/* Instruksi Kode Bayar */}
-            <Card className="p-4 bg-white space-y-2">
+            {/* Box Instruksi & Copy VA */}
+            <Card className="p-4 bg-white space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-[#5F7A6E]">Nomor Rekening / Kode Pembayaran:</span>
-                {salinStatus && (
-                  <span className="text-xs font-bold text-[#1A6B4A]">Tersalin ✓</span>
-                )}
-              </div>
-              <div className="flex items-center justify-between bg-[#F4F7F5] p-3 rounded-xl">
-                <span className="font-mono font-black text-sm text-[#111F1A]">{selectedMetode.va}</span>
+                <div>
+                  <p className="text-xs text-[#8FA89E]">Nomor Pembayaran ({selectedMetode.nama})</p>
+                  <p className="text-sm font-mono font-bold text-[#111F1A] mt-0.5">{selectedMetode.va}</p>
+                </div>
                 <button
-                  type="button"
                   onClick={handleSalin}
-                  className="text-xs font-bold text-[#1A6B4A] flex items-center gap-1 active:scale-95"
+                  className="bg-[#F4F7F5] border border-[#E2EBE7] text-xs font-bold text-[#1A6B4A] px-3 py-1.5 rounded-lg active:scale-95 flex items-center gap-1"
                 >
-                  <Copy size={14} /> Salin
+                  {salinStatus ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                      <span>Tersalin</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 stroke-[2]" />
+                      <span>Salin</span>
+                    </>
+                  )}
                 </button>
+              </div>
+
+              <div className="border-t border-[#E2EBE7] pt-2 text-[11px] text-[#4A6358] space-y-1">
+                <p>1. Buka m-Banking atau gerai pembayaran pilihan Anda.</p>
+                <p>2. Masukkan nomor pembayaran/VA di atas dengan nominal <strong>{rp(activeNominal)}</strong>.</p>
+                <p>3. Saldo akan otomatis masuk ke dompet aplikasi tanpa biaya admin.</p>
               </div>
             </Card>
 
-            <Button
-              full
-              size="lg"
-              variant="primary"
-              onClick={handleProsesTopUp}
-            >
-              Konfirmasi Top-Up {rp(activeNominal)}
-            </Button>
-          </div>
+            {/* Tombol Simulasi Pembayaran Instan */}
+            <div className="pt-2">
+              <Button
+                variant="primary"
+                full
+                size="lg"
+                className="flex items-center justify-center gap-1.5"
+                onClick={handleProsesTopUp}
+              >
+                <Zap className="w-4 h-4 stroke-[2.2]" />
+                Konfirmasi & Simulasi Bayar Sekarang
+              </Button>
+              <p className="text-center text-[10px] text-[#8FA89E] mt-2">
+                Klik tombol di atas untuk simulasi instan top-up saldo dompet
+              </p>
+            </div>
+          </>
         )}
       </div>
     </div>

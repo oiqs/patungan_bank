@@ -1,40 +1,48 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  ArrowLeft,
+  Users,
+  Dices,
+  Trophy,
+  Check,
+} from 'lucide-react'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
 import { rp } from '../../lib/format'
 import { useBankStore } from '../../store/useBankStore'
-import { ArrowLeft, Shuffle, CheckCircle2, Trophy, Clock } from 'lucide-react'
 
 export default function Arisan() {
   const navigate = useNavigate()
-  const { arisan, currentUser, bayarArisan, simpanPemenangArisan } = useBankStore()
+  const { arisan, kocokUndianArisan, bayarArisan } = useBankStore()
 
   const [showUndian, setShowUndian] = useState(false)
   const [spinning, setSpinning] = useState(false)
-  const [winner, setWinner] = useState('')
-  const [displayName, setDisplayName] = useState('')
+  const [displayName, setDisplayName] = useState('?')
+  const [winner, setWinner] = useState(null)
   const [notifBayar, setNotifBayar] = useState('')
-
-  const allNames = arisan.peserta.map(p => p.nama)
 
   const handleUndian = () => {
     setShowUndian(true)
     setSpinning(true)
-    setWinner('')
-    let count = 0
+    setWinner(null)
+
+    const list = arisan.peserta.filter(p => !p.menang).map(p => p.nama)
+    const candidates = list.length > 0 ? list : arisan.peserta.map(p => p.nama)
+
+    let counter = 0
     const interval = setInterval(() => {
-      setDisplayName(allNames[Math.floor(Math.random() * allNames.length)])
-      count++
-      if (count > 18) {
-        clearInterval(interval)
-        const finalWinner = allNames[Math.floor(Math.random() * allNames.length)]
-        setWinner(finalWinner)
-        setDisplayName(finalWinner)
-        setSpinning(false)
-        simpanPemenangArisan(finalWinner, arisan.pot)
-      }
-    }, 110)
+      setDisplayName(candidates[counter % candidates.length])
+      counter++
+    }, 80)
+
+    setTimeout(() => {
+      clearInterval(interval)
+      const pemenang = kocokUndianArisan()
+      setWinner(pemenang)
+      setDisplayName(pemenang)
+      setSpinning(false)
+    }, 2500)
   }
 
   const handleSetor = (nama) => {
@@ -43,153 +51,165 @@ export default function Arisan() {
     setTimeout(() => setNotifBayar(''), 2000)
   }
 
-  const lunasCount = arisan.peserta.filter(p => p.lunas).length
-
   return (
-    <div className="w-full h-full flex flex-col bg-[#F4F7F5] overflow-y-auto no-scrollbar pb-24">
+    <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12 pb-24">
       {/* Header */}
-      <div className="bg-white px-4 py-3.5 border-b border-[#E2EBE7] flex items-center gap-2 sticky top-0 z-10 pt-12">
+      <div className="bg-white px-5 py-4 border-b border-[#E2EBE7] flex items-center gap-3 sticky top-0 z-10 shadow-xs">
         <button
           onClick={() => navigate(-1)}
-          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-[#1A6B4A] hover:bg-[#E6F4EE] active:scale-95 transition-all"
-          aria-label="Kembali"
+          className="text-[#1A6B4A] active:scale-95 transition-transform"
+          title="Kembali"
         >
-          <ArrowLeft size={22} />
+          <ArrowLeft className="w-5 h-5 stroke-[2]" />
         </button>
-        <h1 className="text-[#111F1A] font-bold text-base flex-1">Arisan Digital RT 05</h1>
+        <h1 className="text-[#111F1A] font-bold text-base flex-1">Arisan Digital Tarunesha</h1>
       </div>
 
-      <div className="px-4 py-4 space-y-4">
+      <div className="flex-1 px-4 py-4 flex flex-col gap-4">
         {notifBayar && (
-          <div className="bg-[#E6F4EE] border border-[#1A6B4A]/30 text-[#1A6B4A] text-xs font-bold p-3.5 rounded-2xl text-center animate-fade-in">
+          <div className="bg-[#E6F4EE] border border-[#1A6B4A]/30 text-[#1A6B4A] text-xs font-bold p-3 rounded-2xl text-center">
             {notifBayar}
           </div>
         )}
 
-        {/* Arisan Pot Card (Solid primary) */}
-        <div className="p-5 bg-[#1A6B4A] rounded-3xl text-white shadow-xs space-y-4">
+        {/* Arisan Card */}
+        <Card className="p-5 bg-gradient-to-br from-[#1A6B4A] via-[#237c56] to-[#2D8B63] text-white shadow-lg">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-white/90 text-xs font-bold uppercase tracking-wider">Periode Berjalan</p>
-              <h2 className="text-white font-extrabold text-lg mt-0.5">{arisan.judul}</h2>
-              <p className="text-white/80 text-xs mt-0.5">{arisan.periode} · {rp(arisan.nominalSetoran)} / orang</p>
+              <p className="text-white/80 text-xs mb-1 font-semibold uppercase tracking-wider">Periode Berjalan</p>
+              <h2 className="text-white font-extrabold text-lg">{arisan.judul}</h2>
+              <p className="text-white/80 text-xs mt-0.5">{arisan.periode} · Setoran {rp(arisan.nominalSetoran)}/orang</p>
             </div>
             <div className="text-right">
-              <p className="text-white/90 text-xs font-bold uppercase tracking-wider">Total Pot Dana</p>
-              <p className="text-white font-black text-2xl mt-0.5">{rp(arisan.pot)}</p>
+              <p className="text-white/80 text-xs mb-1 font-semibold uppercase tracking-wider">Total Pot Dana</p>
+              <p className="text-white font-extrabold text-2xl">{rp(arisan.pot)}</p>
             </div>
           </div>
 
-          <div className="bg-[#124E35] rounded-2xl p-3 border border-white/15 flex items-center justify-between text-xs text-white/90">
-            <span>Status Setoran Peserta:</span>
-            <span className="font-bold text-[#4DB87F]">
-              {lunasCount} dari {arisan.peserta.length} Sudah Menyetor
+          <div className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between">
+            <span className="text-xs text-white/90 flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 stroke-[2]" />
+              {arisan.peserta.filter(p => p.lunas).length} dari {arisan.peserta.length} sudah setor
             </span>
+            <Button
+              variant="accent"
+              size="sm"
+              className="flex items-center gap-1.5"
+              onClick={handleUndian}
+            >
+              <Dices className="w-4 h-4 stroke-[2]" />
+              Kocok Undian
+            </Button>
+          </div>
+        </Card>
+
+        {/* Daftar Peserta */}
+        <div>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest">
+              Status Setoran Peserta ({arisan.peserta.length})
+            </p>
           </div>
 
-          <Button
-            full
-            size="lg"
-            variant="accent"
-            onClick={handleUndian}
-            className="shadow-md"
-          >
-            <Shuffle size={18} /> Kocok Undian Digital
-          </Button>
+          <div className="flex flex-col gap-2">
+            {arisan.peserta.map((p, i) => (
+              <Card key={i} className="flex items-center gap-3 px-4 py-3">
+                <div className="w-9 h-9 rounded-full bg-[#E6F4EE] flex items-center justify-center text-sm font-bold text-[#1A6B4A]">
+                  {p.nama.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-[#111F1A] truncate">{p.nama}</p>
+                  <p className="text-[10px] text-[#8FA89E]">Setoran {rp(arisan.nominalSetoran)}</p>
+                </div>
+                {p.lunas ? (
+                  <span className="text-xs font-bold text-[#1A6B4A] bg-[#E6F4EE] px-3 py-1 rounded-full flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5 stroke-[2.5]" /> Lunas
+                  </span>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="accent"
+                    onClick={() => handleSetor(p.nama)}
+                  >
+                    Setor Sekarang
+                  </Button>
+                )}
+              </Card>
+            ))}
+          </div>
         </div>
 
-        {/* Modal / Overlay Kocokan Undian */}
-        {showUndian && (
-          <div className="bg-white border-2 border-[#F5A623] rounded-3xl p-6 text-center space-y-4 shadow-md animate-scale-up">
-            <div className="w-14 h-14 rounded-2xl bg-[#FEF3DC] text-[#A05C00] flex items-center justify-center mx-auto">
-              <Trophy size={28} />
-            </div>
+        {/* Pemenang Sebelumnya */}
+        <div>
+          <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2 px-1">
+            Riwayat Pemenang Undian
+          </p>
+          <Card className="overflow-hidden">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-[#F4F7F5] border-b border-[#E2EBE7]">
+                  <th className="px-4 py-2.5 text-left text-[#4A6358] font-bold">Nama Pemenang</th>
+                  <th className="px-4 py-2.5 text-left text-[#4A6358] font-bold">Periode</th>
+                  <th className="px-4 py-2.5 text-right text-[#4A6358] font-bold">Pot Diterima</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E2EBE7]">
+                {arisan.riwayatPemenang.map((pw, i) => (
+                  <tr key={i} className="hover:bg-[#F9FAF9]">
+                    <td className="px-4 py-3 text-[#111F1A] font-bold">{pw.nama}</td>
+                    <td className="px-4 py-3 text-[#4A6358]">{pw.bulan}</td>
+                    <td className="px-4 py-3 text-right text-[#1A6B4A] font-extrabold">
+                      {typeof pw.jumlah === 'number' ? rp(pw.jumlah) : pw.jumlah}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      </div>
 
-            <div>
-              <h3 className="text-base font-extrabold text-[#111F1A]">
-                {spinning ? 'Mengocok Nama Pemenang...' : 'Selamat Kepada Pemenang!'}
-              </h3>
-              <p className="text-xs text-[#5F7A6E] mt-1">Undian acak transparan sistem Patungan Bank</p>
-            </div>
+      {/* Undian Overlay Modal */}
+      {showUndian && (
+        <div
+          className="fixed inset-0 bg-black/75 flex flex-col items-center justify-center z-50 px-6 backdrop-blur-sm"
+          onClick={() => { if (!spinning) setShowUndian(false) }}
+        >
+          <div
+            className="bg-white rounded-3xl p-8 flex flex-col items-center gap-4 w-full max-w-sm shadow-2xl animate-scale-up"
+            onClick={e => e.stopPropagation()}
+          >
+            <p className="text-[#4A6358] text-xs font-bold uppercase tracking-wider">
+              {spinning ? 'Mengundi Nama Pemenang...' : 'Pemenang Terpilih!'}
+            </p>
 
-            <div className={`p-4 rounded-2xl border-2 ${spinning ? 'bg-[#FEF3DC] border-[#F5A623] animate-pulse' : 'bg-[#E6F4EE] border-[#1A6B4A]'}`}>
-              <p className={`text-2xl font-black ${spinning ? 'text-[#A05C00]' : 'text-[#1A6B4A]'}`}>
-                {displayName || 'Menyiapkan...'}
-              </p>
-              {winner && (
-                <p className="text-xs text-[#1A6B4A] font-bold mt-1">
-                  Mendapatkan Pot Arisan Senilai {rp(arisan.pot)}
-                </p>
+            <div className="w-20 h-20 rounded-2xl bg-[#FEF3DC] flex items-center justify-center">
+              {spinning ? (
+                <Dices className="w-12 h-12 text-[#1A6B4A] animate-spin stroke-[2]" />
+              ) : (
+                <Trophy className="w-12 h-12 text-[#F5A623] animate-bounce stroke-[2]" />
               )}
             </div>
 
+            <p className="text-[#111F1A] text-2xl font-extrabold text-center min-h-[36px]">
+              {displayName}
+            </p>
+
+            {!spinning && winner && (
+              <div className="text-center bg-[#E6F4EE] p-3 rounded-2xl w-full">
+                <p className="text-[#1A6B4A] font-bold text-sm">Selamat kepada {winner}!</p>
+                <p className="text-xs text-[#4A6358] mt-0.5">Berhak menerima dana pot sebesar <strong>{rp(arisan.pot)}</strong>.</p>
+              </div>
+            )}
+
             {!spinning && (
-              <Button
-                full
-                size="md"
-                variant="primary"
-                onClick={() => setShowUndian(false)}
-              >
-                Tutup Layar Undian
+              <Button full size="md" variant="primary" onClick={() => setShowUndian(false)}>
+                Tutup & Simpan Hasil
               </Button>
             )}
           </div>
-        )}
-
-        {/* Daftar Peserta Arisan */}
-        <div className="space-y-2.5">
-          <h3 className="text-sm font-bold text-[#111F1A] px-1">
-            Daftar Setoran Peserta ({arisan.peserta.length} Warga)
-          </h3>
-          <Card className="divide-y divide-[#F4F7F5]">
-            {arisan.peserta.map((p, i) => (
-              <div key={i} className="p-3.5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#F4F7F5] flex items-center justify-center text-xs font-bold text-[#2D4539]">
-                    {p.nama.charAt(0)}
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[#111F1A]">{p.nama}</p>
-                    <p className="text-xs text-[#5F7A6E]">Nomor Undian: #{i + 1}</p>
-                  </div>
-                </div>
-
-                <div>
-                  {p.lunas ? (
-                    <span className="text-xs font-bold text-[#1A6B4A] bg-[#E6F4EE] px-2.5 py-1 rounded-full flex items-center gap-1">
-                      <CheckCircle2 size={13} /> Lunas
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => handleSetor(p.nama)}
-                      className="text-xs font-bold bg-[#1A6B4A] text-white px-3 py-1.5 rounded-xl active:scale-95 shadow-xs"
-                    >
-                      Setor ({shortRp(arisan.nominalSetoran)})
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </Card>
         </div>
-
-        {/* Riwayat Pemenang Sebelumnya */}
-        <div className="space-y-2">
-          <h3 className="text-sm font-bold text-[#111F1A] px-1">Riwayat Pemenang Putaran Lalu</h3>
-          <Card className="p-4 space-y-2.5">
-            {arisan.riwayatPemenang.map((r, i) => (
-              <div key={i} className="flex justify-between items-center text-xs">
-                <div>
-                  <p className="font-bold text-[#111F1A] text-sm">{r.nama}</p>
-                  <p className="text-[#5F7A6E]">{r.periode}</p>
-                </div>
-                <span className="font-bold text-[#1A6B4A] text-sm">{rp(r.hadiah)}</span>
-              </div>
-            ))}
-          </Card>
-        </div>
-
-      </div>
+      )}
     </div>
   )
 }

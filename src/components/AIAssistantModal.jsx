@@ -1,9 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { rp } from '../lib/format'
+import {
+  CreditCard,
+  Landmark,
+  Calculator,
+  Users,
+  Zap,
+  Mic,
+  Send,
+  X,
+} from 'lucide-react'
+import { rp, shortRp } from '../lib/format'
 import { useBankStore } from '../store/useBankStore'
 import NailongAvatar from './NailongAvatar'
-import { X, Send, Mic, Sparkles } from 'lucide-react'
 
 export default function AIAssistantModal({ isOpen, onClose }) {
   const navigate = useNavigate()
@@ -15,6 +24,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
     kasBulanIniKeluar,
     dompetSaldo,
     arisan,
+    pinjamanList,
     bayarIuranWajib,
   } = useBankStore()
 
@@ -24,7 +34,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
     {
       id: 'm1',
       sender: 'ai',
-      text: `Halo Pak/Bu ${currentUser.nama}! 👋 Aku patuAI, asisten pintar Patungan Bank Tarunesha. Ada yang bisa dibantu seputar iuran, kas RT, arisan, atau pinjaman modal?`,
+      text: `Halo ${currentUser.nama}! Aku patuAI, asisten pintar Patungan Bank Tarunesha. Ada yang bisa aku bantu seputar tagihan iuran, kas RT, arisan, atau pembiayaan usaha?`,
       time: 'Baru saja',
     }
   ])
@@ -40,10 +50,10 @@ export default function AIAssistantModal({ isOpen, onClose }) {
   if (!isOpen) return null
 
   const quickPrompts = [
-    { label: 'Cek iuran saya', query: 'Apakah iuran saya sudah lunas?' },
-    { label: 'Uang kas RT', query: 'Berapa saldo kas Tarunesha sekarang?' },
-    { label: 'Simulasi pinjaman', query: 'Berapa cicilan pinjaman Rp 1.000.000?' },
-    { label: 'Info arisan', query: 'Kapan jadwal undian arisan?' },
+    { label: 'Cek iuran saya', icon: CreditCard, query: 'Apakah iuran saya sudah lunas?' },
+    { label: 'Kas RT saat ini', icon: Landmark, query: 'Berapa saldo kas Tarunesha sekarang?' },
+    { label: 'Simulasi pinjaman', icon: Calculator, query: 'Berapa cicilan pinjaman Rp 1.000.000?' },
+    { label: 'Info arisan', icon: Users, query: 'Kapan jadwal undian arisan?' },
   ]
 
   const handleSend = (text) => {
@@ -61,6 +71,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
     setInputPesan('')
     setIsTyping(true)
 
+    // Logika AI Respons Cerdas berdasarkan state aplikasi nyata
     setTimeout(() => {
       let aiReply = {}
       const lower = query.toLowerCase()
@@ -71,7 +82,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
           aiReply = {
             id: `ai-${Date.now()}`,
             sender: 'ai',
-            text: `Anda memiliki 1 tagihan belum lunas: **${belum.judul}** sebesar **${rp(belum.nominal)}** (Jatuh tempo: ${belum.jatuhTempo}). Saldo dompet Anda saat ini **${rp(dompetSaldo)}**.`,
+            text: `Saya mengecek data pembukuan Anda. Anda memiliki 1 tagihan belum lunas: **${belum.judul}** sebesar **${rp(belum.nominal)}** (Jatuh tempo: ${belum.jatuhTempo}). Saldo dompet Anda saat ini **${rp(dompetSaldo)}**.`,
             action: {
               type: 'bayar_iuran',
               tagihanId: belum.id,
@@ -84,7 +95,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
           aiReply = {
             id: `ai-${Date.now()}`,
             sender: 'ai',
-            text: `Kabar baik! Seluruh tagihan iuran wajib Anda hingga saat ini sudah **Lunas**. Terima kasih telah disiplin bergotong royong! ⭐`,
+            text: `Kabar baik! Seluruh tagihan iuran wajib Anda hingga saat ini sudah **Lunas** (100% disiplin). Pertahankan skor reputasi Anda ya! ⭐`,
             time: 'Baru saja',
           }
         }
@@ -92,11 +103,11 @@ export default function AIAssistantModal({ isOpen, onClose }) {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `Ringkasan Uang Kas RT Tarunesha per hari ini:\n• **Total Saldo Kas:** ${rp(kasSaldo)}\n• **Pemasukan Bulan Ini:** +${rp(kasBulanIniMasuk)}\n• **Pengeluaran Bulan Ini:** -${rp(kasBulanIniKeluar)}\n\nLaporan ini transparan dan dapat diawasi bersama seluruh warga.`,
+          text: `Berikut ringkasan kas Tarunesha RT 05 real-time:\n• **Total Saldo Kas:** ${rp(kasSaldo)}\n• **Pemasukan Bulan Ini:** +${rp(kasBulanIniMasuk)}\n• **Pengeluaran Nota:** -${rp(kasBulanIniKeluar)}\n\nLaporan ini bersifat transparan dan diawasi bersama seluruh warga.`,
           action: {
             type: 'link',
-            url: '/kas',
-            label: 'Lihat Buku Kas & Rekap',
+            url: '/kas/laporan',
+            label: 'Buka Buku Kas & Laporan PDF',
           },
           time: 'Baru saja',
         }
@@ -104,11 +115,11 @@ export default function AIAssistantModal({ isOpen, onClose }) {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `Skor reputasi Anda adalah **${currentUser.skor}/100** dengan batas plafon hingga **${rp(currentUser.plafonTersedia)}**.\n\nSimulasi pinjaman Rp 1.000.000 (tenor 6 bulan):\n• Cicilan pokok + jasa gotong royong (1.5%/bln): **Rp 181.600 / bulan**.\nPengajuan mudah tanpa agunan sertifikat.`,
+          text: `Skor reputasi Anda adalah **${currentUser.skor}/100** dengan plafon pembiayaan hingga **${rp(currentUser.plafonTersedia)}**.\n\nContoh simulasi modal tani Rp 1.000.000 (tenor 6 bulan):\n• Cicilan pokok + jasa gotong royong (1.5%/bln): **Rp 181.600 / bulan**.\nPengajuan bisa diajukan langsung secara online dengan melampirkan foto lahan.`,
           action: {
             type: 'link',
             url: '/layanan/ajukan-pinjaman',
-            label: 'Buka Formulir Pengajuan',
+            label: 'Ajukan Pinjaman Modal Sekarang',
           },
           time: 'Baru saja',
         }
@@ -117,7 +128,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `**${arisan.judul} (${arisan.periode})**:\n• Total pot saat ini: **${rp(arisan.pot)}**\n• Status setoran: ${lunasCount} dari ${arisan.peserta.length} peserta sudah menyetor.\nUndian dikocok transparan secara berkala.`,
+          text: `**${arisan.judul} (${arisan.periode})**:\n• Total pot saat ini: **${rp(arisan.pot)}**\n• Status setoran: ${lunasCount} dari ${arisan.peserta.length} peserta sudah menyetor.\nUndian putaran ini siap dikocok saat rapat warga RT 05!`,
           action: {
             type: 'link',
             url: '/layanan/arisan',
@@ -129,14 +140,14 @@ export default function AIAssistantModal({ isOpen, onClose }) {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `Aku mengerti pertanyaan Anda tentang "${query}". Silakan cek menu **Kas RT** untuk iuran & laporan, menu **Layanan** untuk arisan & pembiayaan, atau **Dompet** untuk saldo Anda.`,
+          text: `Saya memahami pertanyaan Anda tentang "${query}". Anda dapat mengecek menu **Kas** untuk iuran & laporan, menu **Layanan** untuk arisan & pinjaman modal, atau **Dompet** untuk saldo Tarunesha Pay.`,
           time: 'Baru saja',
         }
       }
 
       setIsTyping(false)
       setMessages(prev => [...prev, aiReply])
-    }, 700)
+    }, 800)
   }
 
   const handleAction = (action) => {
@@ -148,7 +159,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
           {
             id: `ai-notif-${Date.now()}`,
             sender: 'ai',
-            text: `✅ Pembayaran iuran berhasil! Saldo dompet Anda telah dipotong dan tagihan berstatus Lunas.`,
+            text: `Pembayaran iuran berhasil diproses! Saldo dompet otomatis dipotong dan status tagihan sekarang Lunas.`,
             time: 'Baru saja',
           }
         ])
@@ -158,7 +169,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
           {
             id: `ai-notif-${Date.now()}`,
             sender: 'ai',
-            text: `⚠️ Saldo dompet Anda tidak cukup untuk membayar tagihan. Silakan isi saldo di menu Dompet.`,
+            text: `Saldo dompet Anda tidak cukup untuk membayar tagihan. Silakan top-up terlebih dahulu di menu Dompet.`,
             time: 'Baru saja',
           }
         ])
@@ -170,43 +181,46 @@ export default function AIAssistantModal({ isOpen, onClose }) {
   }
 
   return (
-    <div className="absolute inset-0 z-50 bg-black/60 flex items-end justify-center sm:items-center animate-fade-in">
-      <div className="bg-[#F4F7F5] w-full h-[90%] sm:h-[660px] rounded-t-[32px] sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl animate-slide-up border border-[#E2EBE7]">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center p-0 sm:p-4 animate-fade-in">
+      <div className="bg-[#F4F7F5] w-full max-w-md h-[88vh] sm:h-[650px] rounded-t-[32px] sm:rounded-3xl flex flex-col overflow-hidden shadow-2xl animate-slide-up">
         
-        {/* Header patuAI */}
-        <div className="bg-[#1A6B4A] px-5 py-3.5 text-white flex items-center justify-between shadow-xs flex-shrink-0">
+        {/* Header Asisten AI */}
+        <div className="bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] px-5 py-4 text-white flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center p-1">
+            <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center p-1 shadow-inner">
               <NailongAvatar className="w-7 h-7" animated />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="font-bold text-base">patuAI Asisten</h3>
+                <h3 className="font-extrabold text-sm">patuAI Asisten</h3>
                 <span className="w-2 h-2 rounded-full bg-[#4DB87F] animate-pulse" />
               </div>
-              <p className="text-xs text-white/90">Asisten Keuangan Warga Tarunesha</p>
+              <p className="text-[11px] text-white/80">Asisten Cerdas Keuangan Tarunesha</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white active:scale-90 transition-transform"
-            aria-label="Tutup"
+            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white active:scale-90 transition-transform"
           >
-            <X size={20} />
+            <X className="w-4 h-4 stroke-[2]" />
           </button>
         </div>
 
         {/* Quick Prompts Chips */}
-        <div className="bg-white px-4 py-3 border-b border-[#E2EBE7] flex gap-2 overflow-x-auto no-scrollbar flex-shrink-0">
-          {quickPrompts.map((p, i) => (
-            <button
-              key={i}
-              onClick={() => handleSend(p.query)}
-              className="px-3.5 py-2 rounded-full bg-[#EBF7F1] hover:bg-[#d8efe3] text-[#1A6B4A] text-xs font-bold whitespace-nowrap active:scale-95 transition-transform border border-[#1A6B4A]/20 flex-shrink-0"
-            >
-              {p.label}
-            </button>
-          ))}
+        <div className="bg-white px-4 py-2.5 border-b border-[#E2EBE7] flex gap-2 overflow-x-auto no-scrollbar">
+          {quickPrompts.map((p, i) => {
+            const Icon = p.icon
+            return (
+              <button
+                key={i}
+                onClick={() => handleSend(p.query)}
+                className="px-3 py-1.5 rounded-full bg-[#EBF7F1] hover:bg-[#d8efe3] text-[#1A6B4A] text-xs font-bold whitespace-nowrap active:scale-95 transition-transform border border-[#1A6B4A]/15 flex items-center gap-1.5 flex-shrink-0"
+              >
+                <Icon className="w-3.5 h-3.5 stroke-[2]" />
+                {p.label}
+              </button>
+            )
+          })}
         </div>
 
         {/* Chat History List */}
@@ -217,13 +231,14 @@ export default function AIAssistantModal({ isOpen, onClose }) {
               className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}
             >
               <div
-                className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed shadow-xs ${
+                className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed shadow-sm ${
                   m.sender === 'user'
                     ? 'bg-[#1A6B4A] text-white rounded-tr-none'
                     : 'bg-white text-[#111F1A] border border-[#E2EBE7] rounded-tl-none'
                 }`}
               >
-                <div className="space-y-1.5">
+                {/* Parse basic markdown bolding & newlines */}
+                <div className="space-y-1">
                   {m.text.split('\n').map((line, li) => (
                     <p key={li} dangerouslySetInnerHTML={{
                       __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -231,24 +246,25 @@ export default function AIAssistantModal({ isOpen, onClose }) {
                   ))}
                 </div>
 
+                {/* Optional Action Button inside Message */}
                 {m.action && (
-                  <div className="mt-3 pt-3 border-t border-[#E2EBE7]">
+                  <div className="mt-3 pt-2.5 border-t border-[#E2EBE7]">
                     <button
                       onClick={() => handleAction(m.action)}
-                      className="w-full min-h-[42px] py-2 px-3 bg-[#1A6B4A] hover:bg-[#207e58] text-white font-bold rounded-xl text-sm active:scale-95 transition-transform flex items-center justify-center gap-1.5 shadow-xs"
+                      className="w-full py-2 px-3 bg-[#1A6B4A] hover:bg-[#237c56] text-white font-bold rounded-xl text-xs active:scale-95 transition-transform flex items-center justify-center gap-1.5 shadow-sm"
                     >
-                      <Sparkles size={16} /> {m.action.label}
+                      <Zap className="w-3.5 h-3.5 stroke-[2.2]" /> {m.action.label}
                     </button>
                   </div>
                 )}
               </div>
-              <span className="text-xs text-[#5F7A6E] mt-1 px-1">{m.time}</span>
+              <span className="text-[10px] text-[#8FA89E] mt-1 px-1">{m.time}</span>
             </div>
           ))}
 
           {/* AI Typing indicator */}
           {isTyping && (
-            <div className="flex items-center gap-2 text-xs text-[#5F7A6E] bg-white border border-[#E2EBE7] px-3.5 py-2 rounded-2xl rounded-tl-none w-36 shadow-xs">
+            <div className="flex items-center gap-2 text-xs text-[#8FA89E] bg-white border border-[#E2EBE7] px-3.5 py-2 rounded-2xl rounded-tl-none w-36 shadow-sm">
               <NailongAvatar className="w-4 h-4" animated />
               <span className="font-bold text-[#1A6B4A]">patuAI</span>
               <span className="flex gap-1 items-center">
@@ -263,7 +279,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
         </div>
 
         {/* Input Bar */}
-        <div className="p-3 bg-white border-t border-[#E2EBE7] flex-shrink-0">
+        <div className="p-3 bg-white border-t border-[#E2EBE7]">
           <form
             onSubmit={(e) => {
               e.preventDefault()
@@ -271,34 +287,33 @@ export default function AIAssistantModal({ isOpen, onClose }) {
             }}
             className="flex items-center gap-2"
           >
-            <div className="flex-1 bg-[#F4F7F5] border border-[#D5E2DC] rounded-2xl px-4 py-2.5 flex items-center gap-2 focus-within:border-[#1A6B4A] focus-within:bg-white transition-colors">
+            <div className="flex-1 bg-[#F4F7F5] border border-[#E2EBE7] rounded-2xl px-3.5 py-2 flex items-center gap-2 focus-within:border-[#1A6B4A]">
               <input
                 type="text"
                 placeholder="Tanya tagihan, pinjaman, kas..."
                 value={inputPesan}
                 onChange={e => setInputPesan(e.target.value)}
-                className="w-full bg-transparent text-base text-[#111F1A] focus:outline-none placeholder-[#5F7A6E]"
+                className="w-full bg-transparent text-xs text-[#111F1A] focus:outline-none placeholder-[#8FA89E]"
               />
               <button
                 type="button"
                 onClick={() => handleSend('Berapa saldo kas Tarunesha saat ini?')}
-                title="Bicara dengan suara"
-                className="w-9 h-9 flex items-center justify-center text-[#5F7A6E] hover:text-[#1A6B4A] active:scale-90"
+                title="Input suara"
+                className="text-[#8FA89E] hover:text-[#1A6B4A] p-1 active:scale-90 transition-colors"
               >
-                <Mic size={18} />
+                <Mic className="w-4 h-4 stroke-[2]" />
               </button>
             </div>
             <button
               type="submit"
               disabled={!inputPesan.trim()}
-              className="w-12 h-12 rounded-2xl bg-[#1A6B4A] disabled:opacity-40 text-white flex items-center justify-center font-bold active:scale-95 transition-all shadow-sm flex-shrink-0"
-              aria-label="Kirim"
+              className="w-10 h-10 rounded-2xl bg-[#1A6B4A] disabled:opacity-40 text-white flex items-center justify-center active:scale-90 transition-transform shadow-md"
             >
-              <Send size={18} />
+              <Send className="w-4 h-4 stroke-[2]" />
             </button>
           </form>
-          <p className="text-xs text-center text-[#5F7A6E] mt-2">
-            patuAI siap membantu kebutuhan keuangan warga Tarunesha
+          <p className="text-[10px] text-center text-[#8FA89E] mt-1.5">
+            Didukung AI Pemahaman Keuangan Warga Tarunesha
           </p>
         </div>
 

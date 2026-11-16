@@ -1,20 +1,27 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  Sprout,
+  Waves,
+  AlertCircle,
+  Users,
+  Landmark,
+  Calendar,
+  HeartHandshake,
+  Calculator,
+  ArrowRight,
+  TrendingUp,
+} from 'lucide-react'
 import { rp, shortRp } from '../lib/format'
 import Card from '../components/Card'
 import Button from '../components/Button'
 import { useBankStore } from '../store/useBankStore'
-import {
-  Shuffle,
-  HandCoins,
-  CalendarDays,
-  HeartHandshake,
-  Plus,
-  ArrowRight,
-  CheckCircle2,
-  ChevronRight,
-  TrendingUp
-} from 'lucide-react'
+
+const jenisPinjaman = [
+  { icon: Sprout, label: 'Pertanian', color: 'text-[#1A6B4A]' },
+  { icon: Waves, label: 'Perikanan', color: 'text-[#2B6CB0]' },
+  { icon: AlertCircle, label: 'Pribadi/Darurat', color: 'text-[#E84040]' },
+]
 
 export default function Layanan() {
   const navigate = useNavigate()
@@ -24,74 +31,63 @@ export default function Layanan() {
     bayarCicilanPinjaman,
   } = useBankStore()
 
+  const [jenis, setJenis] = useState(0)
+  const [nominal, setNominal] = useState(1200000)
+  const [tenor, setTenor] = useState(6)
   const [bayarNotif, setBayarNotif] = useState('')
+
+  const cicilan = Math.round(nominal * (1 + (tenor * 0.015)) / tenor)
 
   const layananMenu = [
     {
-      icon: Shuffle,
-      label: 'Arisan RT Digital',
-      bg: 'bg-[#FEF3DC]',
-      color: 'text-[#A05C00]',
-      desc: 'Setoran bulanan & undian putaran transparan',
-      badge: 'Putaran 3 Aktif',
+      icon: Users, label: 'Arisan Digital', bg: 'bg-[#FEF3DC]', color: 'text-[#B7791F]',
+      desc: 'Jadwal setoran & undian transparan',
+      badge: 'Aktif',
       to: '/layanan/arisan'
     },
     {
-      icon: HandCoins,
-      label: 'Pembiayaan Usaha',
-      bg: 'bg-[#E8EEF9]',
-      color: 'text-[#2B5EA7]',
-      desc: 'Modal usaha mikro & gotong royong tanpa agunan',
+      icon: Landmark, label: 'Pembiayaan', bg: 'bg-[#E8EEF9]', color: 'text-[#2B6CB0]',
+      desc: 'Modal usaha tani & darurat',
       badge: `${pinjamanList.length} Aktif`,
       to: '/layanan/ajukan-pinjaman'
     },
     {
-      icon: CalendarDays,
-      label: 'Kegiatan Warga',
-      bg: 'bg-[#E6F4EE]',
-      color: 'text-[#1A6B4A]',
-      desc: 'Gotong royong, peringatan 17-an & perbaikan jalan',
-      badge: '2 Agenda',
-      to: '/layanan/kegiatan?tab=kegiatan'
+      icon: Calendar, label: 'Kegiatan Warga', bg: 'bg-[#E6F4EE]', color: 'text-[#1A6B4A]',
+      desc: '17-an, tahun baru, gotong royong',
+      badge: '2 Event',
+      to: '/layanan/kegiatan'
     },
     {
-      icon: HeartHandshake,
-      label: 'Dana Sosial & Duka',
-      bg: 'bg-[#FAEAEA]',
-      color: 'text-[#C93535]',
-      desc: 'Santunan warga sakit, duka, dan bantuan darurat',
-      badge: 'Tersedia',
-      to: '/layanan/kegiatan?tab=sosial'
+      icon: HeartHandshake, label: 'Dana Sosial', bg: 'bg-[#FAEAEA]', color: 'text-[#C53030]',
+      desc: 'Santunan warga sakit & duka',
+      badge: 'Open',
+      to: '/layanan/kegiatan'
     },
   ]
 
   const handleBayarCicilan = (p) => {
     const success = bayarCicilanPinjaman(p.id, p.cicilanPerBulan)
     if (success) {
-      setBayarNotif(`Cicilan bulan ini berhasil dibayar via saldo dompet!`)
-      setTimeout(() => setBayarNotif(''), 2500)
+      setBayarNotif('Cicilan berhasil dibayar via saldo dompet!')
+      setTimeout(() => setBayarNotif(''), 2000)
     } else {
-      setBayarNotif('Saldo dompet tidak cukup! Silakan isi saldo di menu Dompet.')
+      setBayarNotif('Saldo dompet kurang! Silakan isi saldo terlebih dahulu.')
       setTimeout(() => setBayarNotif(''), 2500)
     }
   }
 
   return (
-    <div className="w-full pb-24">
+    <div className="w-full">
 
-      {/* ── HEADER HALAMAN ── */}
-      <div className="bg-white border-b border-[#E2EBE7] pt-12 pb-3 px-5">
-        <h1 className="text-xl font-extrabold text-[#111F1A] tracking-tight">
-          Layanan Komunitas
-        </h1>
-        <p className="text-sm text-[#5F7A6E] mt-0.5">
-          Program gotong royong &amp; kesejahteraan warga RT 05
-        </p>
+      {/* ── HEADER ── */}
+      <div className="bg-[#F4F7F5] pt-12 pb-2 px-5">
+        <h1 className="text-xl font-extrabold text-[#111F1A] tracking-tight">Layanan Komunitas</h1>
+        <p className="text-xs text-[#8FA89E] mt-0.5">Arisan digital, pinjaman produktif & gotong royong</p>
       </div>
 
-      <div className="px-4 py-4 space-y-5">
+      <div className="px-4 mt-3 space-y-5 pb-20">
 
-        {/* ── GRID 4 LAYANAN KOMUNITAS ── */}
+        {/* ── LAYANAN GRID ── */}
         <div className="grid grid-cols-2 gap-3">
           {layananMenu.map((l) => {
             const Icon = l.icon
@@ -99,157 +95,213 @@ export default function Layanan() {
               <Card
                 key={l.label}
                 onClick={() => navigate(l.to)}
-                className="p-4 cursor-pointer active:scale-95 transition-transform hover:border-[#1A6B4A] flex flex-col justify-between min-h-[140px]"
+                className="p-4 cursor-pointer active:scale-95 transition-transform hover:shadow-md"
               >
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`w-12 h-12 ${l.bg} ${l.color} rounded-2xl flex items-center justify-center shadow-xs`}>
-                      <Icon size={24} strokeWidth={2.2} />
-                    </div>
-                    {l.badge && (
-                      <span className="text-xs font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2 py-0.5 rounded-full">
-                        {l.badge}
-                      </span>
-                    )}
+                <div className="flex items-start justify-between mb-2.5">
+                  <div className={`w-11 h-11 ${l.bg} ${l.color} rounded-xl flex items-center justify-center`}>
+                    <Icon className="w-5 h-5 stroke-[2]" />
                   </div>
-                  <h3 className="text-base font-bold text-[#111F1A] leading-tight">{l.label}</h3>
-                  <p className="text-xs text-[#5F7A6E] mt-1 leading-relaxed">{l.desc}</p>
+                  {l.badge && (
+                    <span className="text-[10px] font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2 py-0.5 rounded-full">
+                      {l.badge}
+                    </span>
+                  )}
                 </div>
+                <p className="text-sm font-bold text-[#111F1A]">{l.label}</p>
+                <p className="text-xs text-[#8FA89E] mt-0.5 leading-relaxed">{l.desc}</p>
               </Card>
             )
           })}
         </div>
 
-        {/* ── BAGIAN RINGKASAN PEMBIAYAAN & PINJAMAN BERJALAN ── */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between px-1">
-            <h3 className="text-base font-bold text-[#111F1A]">
-              Pembiayaan Bergulir Warga
-            </h3>
+        {/* ── PEMBIAYAAN SECTION ── */}
+        <div>
+          <div className="flex items-center justify-between mb-2.5 px-1">
+            <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest">Pembiayaan Bergulir</p>
             <button
               onClick={() => navigate('/layanan/ajukan-pinjaman')}
-              className="text-sm font-bold text-[#1A6B4A] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#1A6B4A]"
             >
-              <Plus size={16} />
-              <span>Ajukan Baru</span>
+              + Ajukan Pinjaman
             </button>
           </div>
 
-          {/* Kartu Skor Reputasi & Plafon */}
+          {/* Score card */}
           <div
             onClick={() => navigate('/profil/skor')}
-            className="bg-white border-2 border-[#1A6B4A]/25 rounded-2xl p-4 flex items-center gap-4 cursor-pointer active:scale-98 transition-all hover:border-[#1A6B4A] shadow-xs"
+            className="bg-gradient-to-r from-[#1A6B4A] to-[#4DB87F] rounded-2xl p-4 flex items-center gap-4 mb-3 shadow-[0_4px_16px_rgba(26,107,74,0.3)] cursor-pointer active:scale-98 transition-transform"
           >
-            <div className="w-14 h-14 rounded-2xl bg-[#E6F4EE] text-[#1A6B4A] border border-[#1A6B4A]/30 flex flex-col items-center justify-center flex-shrink-0">
-              <span className="text-xl font-black leading-none">{currentUser.skor}</span>
-              <span className="text-[10px] font-bold text-[#1A6B4A] mt-0.5">SKOR</span>
+            <div className="w-16 h-16 rounded-full bg-white/15 border-2 border-white/40 flex flex-col items-center justify-center flex-shrink-0">
+              <span className="text-xl font-extrabold text-white leading-none">{currentUser.skor}</span>
+              <span className="text-[9px] text-white/70 font-semibold mt-0.5">SKOR</span>
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-bold text-[#111F1A]">Skor Kelayakan Anggota</p>
-                <span className="text-xs text-[#1A6B4A] font-bold flex items-center">
-                  Rincian <ChevronRight size={14} />
+                <p className="text-white font-bold text-sm">Skor Kelayakan Anda</p>
+                <span className="text-[10px] text-white/80 font-bold flex items-center gap-0.5">
+                  Rincian <ArrowRight className="w-3 h-3 stroke-[2]" />
                 </span>
               </div>
-              <p className="text-xs text-[#5F7A6E] mt-0.5">Batas plafon pembiayaan tersedia:</p>
-              <p className="text-lg font-black text-[#1A6B4A] mt-0.5">
-                {rp(currentUser.plafonTersedia)}
-              </p>
+              <p className="text-white/70 text-xs">Plafon pembiayaan tersedia</p>
+              <span className="inline-block bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full mt-1.5">
+                {shortRp(currentUser.plafonTersedia)}
+              </span>
             </div>
           </div>
 
-          {bayarNotif && (
-            <div className="bg-[#E6F4EE] border border-[#1A6B4A] text-[#1A6B4A] text-sm font-bold p-3 rounded-2xl text-center animate-fade-in">
-              {bayarNotif}
+          {/* Jenis selector */}
+          <div className="flex gap-2 mb-3">
+            {jenisPinjaman.map((j, i) => {
+              const Icon = j.icon
+              return (
+                <button
+                  key={j.label}
+                  onClick={() => setJenis(i)}
+                  className={`flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border-2 transition-all text-sm ${
+                    jenis === i
+                      ? 'border-[#1A6B4A] bg-[#E8F4EE] font-bold'
+                      : 'border-[#E2EBE7] bg-white'
+                  }`}
+                >
+                  <div className={j.color}>
+                    <Icon className="w-5 h-5 stroke-[2]" />
+                  </div>
+                  <span className="text-[11px] font-semibold text-[#4A6358]">{j.label}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Simulasi */}
+          <Card className="p-4">
+            <p className="text-sm font-bold text-[#111F1A] mb-2 flex items-center gap-1.5">
+              <Calculator className="w-4 h-4 text-[#1A6B4A] stroke-[2]" />
+              Simulasi Pinjaman Mandiri
+            </p>
+            <p className="text-2xl font-extrabold text-[#1A6B4A] mb-2">{rp(nominal)}</p>
+
+            <input
+              type="range"
+              min={200000}
+              max={currentUser.plafonTersedia}
+              step={100000}
+              value={nominal}
+              onChange={e => setNominal(+e.target.value)}
+              className="w-full mb-1 accent-[#1A6B4A]"
+            />
+            <div className="flex justify-between text-[10px] text-[#8FA89E] mb-3">
+              <span>Rp 200rb</span><span>{shortRp(currentUser.plafonTersedia)}</span>
             </div>
-          )}
 
-          {/* Daftar Pinjaman Aktif Milik Pengguna */}
-          <div className="space-y-3 pt-1">
-            <h4 className="text-sm font-bold text-[#2D4539] px-1">Pinjaman Aktif Anda</h4>
+            {/* Tenor */}
+            <div className="flex gap-2 mb-4">
+              {[3, 6, 12].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTenor(t)}
+                  className={`flex-1 py-2 rounded-full text-xs font-bold border-2 transition-all ${
+                    tenor === t
+                      ? 'border-[#1A6B4A] bg-[#E8F4EE] text-[#1A6B4A]'
+                      : 'border-[#E2EBE7] bg-white text-[#4A6358]'
+                  }`}
+                >
+                  {t} Bulan
+                </button>
+              ))}
+            </div>
 
-            {pinjamanList.length === 0 ? (
-              <Card className="p-5 text-center">
-                <p className="text-sm text-[#5F7A6E]">Belum ada pinjaman berjalan.</p>
-                <div className="mt-3">
-                  <Button
-                    variant="primary"
-                    size="md"
-                    onClick={() => navigate('/layanan/ajukan-pinjaman')}
-                  >
-                    + Ajukan Pembiayaan Modal
-                  </Button>
+            {/* Result */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {[
+                { label: 'Cicilan/bln', val: shortRp(cicilan) },
+                { label: 'Total Bayar', val: shortRp(cicilan * tenor) },
+                { label: 'Jasa Gotong', val: '1.5%/bln' },
+              ].map((r) => (
+                <div key={r.label} className="bg-[#F4F7F5] rounded-xl p-2.5 text-center">
+                  <p className="text-[10px] text-[#8FA89E] font-semibold mb-0.5">{r.label}</p>
+                  <p className="text-xs font-extrabold text-[#111F1A]">{r.val}</p>
                 </div>
-              </Card>
-            ) : (
-              pinjamanList.map((p) => {
-                const sisaCicilan = p.tenorBulan - p.cicilanTerbayar
-                const isLunas = sisaCicilan <= 0
+              ))}
+            </div>
 
+            <Button
+              variant="primary"
+              full
+              className="flex items-center justify-center gap-1.5"
+              onClick={() => navigate('/layanan/ajukan-pinjaman')}
+            >
+              Ajukan Pembiayaan Ini
+              <ArrowRight className="w-4 h-4 stroke-[2]" />
+            </Button>
+          </Card>
+
+          {/* Pinjaman aktif */}
+          {pinjamanList.length > 0 && (
+            <div className="mt-4">
+              <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2 px-1">
+                Pinjaman Sedang Berjalan
+              </p>
+
+              {bayarNotif && (
+                <div className={`p-3 rounded-xl text-xs font-bold text-center mb-2 ${
+                  bayarNotif.includes('berhasil') ? 'bg-green-50 text-[#1A6B4A]' : 'bg-red-50 text-[#E84040]'
+                }`}>
+                  {bayarNotif}
+                </div>
+              )}
+
+              {pinjamanList.map((p) => {
+                const pct = Math.round((p.terbayar / p.nominal) * 100)
                 return (
                   <Card key={p.id} className="p-4 space-y-3">
                     <div className="flex items-start justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2.5 py-0.5 rounded-full">
-                            {p.kategori}
-                          </span>
-                          <span className="text-xs text-[#5F7A6E]">
-                            Tenor {p.tenorBulan} bulan
-                          </span>
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-[#E8EEF9] text-[#2B6CB0] flex items-center justify-center flex-shrink-0">
+                          <Landmark className="w-4 h-4 stroke-[2]" />
                         </div>
-                        <h4 className="text-base font-extrabold text-[#111F1A] mt-1">{p.nama}</h4>
-                        <p className="text-sm text-[#5F7A6E]">
-                          Total pinjaman: <strong className="text-[#111F1A]">{rp(p.nominal)}</strong>
-                        </p>
+                        <div>
+                          <p className="text-sm font-bold text-[#111F1A]">
+                            {p.judul}
+                          </p>
+                          <p className="text-xs text-[#8FA89E] mt-0.5">
+                            Cair {p.tglPencairan} · Tenor {p.tenorBulan} bulan
+                          </p>
+                        </div>
                       </div>
-
-                      <div className="text-right">
-                        <span className="text-xs text-[#5F7A6E] block">Cicilan / bulan</span>
-                        <span className="text-base font-black text-[#1A6B4A]">
-                          {rp(p.cicilanPerBulan)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="bg-[#F4F7F5] rounded-xl p-3 flex items-center justify-between text-xs text-[#2D4539]">
-                      <div>
-                        <span>Kemajuan Angsuran: </span>
-                        <strong>{p.cicilanTerbayar} dari {p.tenorBulan} bulan</strong>
-                      </div>
-                      <span className="font-bold text-[#1A6B4A]">
-                        {Math.round((p.cicilanTerbayar / p.tenorBulan) * 100)}%
+                      <span className="text-[11px] font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2.5 py-1 rounded-full">
+                        {p.status}
                       </span>
                     </div>
 
-                    <div className="w-full h-2.5 bg-[#E2EBE7] rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-[#F4F7F5] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#1A6B4A] rounded-full transition-all"
-                        style={{ width: `${(p.cicilanTerbayar / p.tenorBulan) * 100}%` }}
+                        className="h-full bg-gradient-to-r from-[#1A6B4A] to-[#4DB87F] rounded-full"
+                        style={{ width: `${pct}%` }}
                       />
                     </div>
 
-                    {!isLunas ? (
+                    <div className="flex justify-between text-xs text-[#8FA89E]">
+                      <span>Terbayar: {shortRp(p.terbayar)} / {shortRp(p.nominal)}</span>
+                      <span>Sisa pokok: {shortRp(p.sisaPokok)}</span>
+                    </div>
+
+                    {p.sisaPokok > 0 && (
                       <Button
-                        full
-                        size="md"
                         variant="primary"
+                        full
+                        size="sm"
                         onClick={() => handleBayarCicilan(p)}
                       >
-                        Bayar Cicilan Bulan Ini ({rp(p.cicilanPerBulan)})
+                        Bayar Cicilan ke-{p.cicilanKe} ({rp(p.cicilanPerBulan)})
                       </Button>
-                    ) : (
-                      <div className="text-center py-1 text-sm font-bold text-[#1A6B4A] flex items-center justify-center gap-1.5">
-                        <CheckCircle2 size={16} /> Pinjaman Telah Lunas Sempurna
-                      </div>
                     )}
                   </Card>
                 )
-              })
-            )}
-          </div>
-        </div>
+              })}
+            </div>
+          )}
 
+        </div>
       </div>
     </div>
   )

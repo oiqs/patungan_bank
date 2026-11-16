@@ -1,8 +1,17 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  Fingerprint,
+  Delete,
+  Sprout,
+  Check,
+  Loader2,
+  User,
+  ShieldCheck,
+} from 'lucide-react'
 import { useBankStore, PRESET_USERS } from '../../store/useBankStore'
 
-const NUMPAD = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '👆', '0', '⌫']
+const NUMPAD = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'bio', '0', 'del']
 
 export default function Login() {
   const navigate = useNavigate()
@@ -20,9 +29,9 @@ export default function Login() {
   const handlePress = (key) => {
     setErrorMessage('')
 
-    if (key === '⌫') {
+    if (key === 'del') {
       setPin(p => p.slice(0, -1))
-    } else if (key === '👆') {
+    } else if (key === 'bio') {
       triggerBiometricLogin()
     } else if (pin.length < 6) {
       const nextPin = [...pin, key]
@@ -81,7 +90,7 @@ export default function Login() {
         
         {/* App Title */}
         <div className="flex items-center gap-1.5 mb-3 bg-white/10 px-3 py-1 rounded-full border border-white/15">
-          <span className="text-sm">🌱</span>
+          <Sprout className="w-4 h-4 text-[#4DB87F] stroke-[2]" />
           <span className="text-[11px] font-bold tracking-wide uppercase text-white/90">
             Patungan Bank Tarunesha
           </span>
@@ -89,8 +98,12 @@ export default function Login() {
 
         {/* Selected User Avatar */}
         <div className="relative mb-2">
-          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-3xl shadow-inner border border-white/20">
-            {activePreset.avatar}
+          <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-inner border border-white/20">
+            {activePreset.peran === 'Anggota' ? (
+              <User className="w-8 h-8 stroke-[1.8]" />
+            ) : (
+              <ShieldCheck className="w-8 h-8 stroke-[1.8]" />
+            )}
           </div>
           <span className="absolute -bottom-1 -right-1 text-[9px] font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2 py-0.5 rounded-full shadow-sm border border-white">
             {activePreset.peran}
@@ -124,7 +137,7 @@ export default function Login() {
         {/* Status Text / Error / Success Toast */}
         {successInfo ? (
           <div className="bg-[#E6F4EE] border border-[#1A6B4A] text-[#1A6B4A] text-xs font-bold px-4 py-2 rounded-xl mb-3 flex items-center gap-2 animate-bounce">
-            <span>✓</span>
+            <Check className="w-4 h-4 stroke-[2.5]" />
             <span>Berhasil masuk sebagai {successInfo.peran}: {successInfo.nama}!</span>
           </div>
         ) : errorMessage ? (
@@ -133,7 +146,7 @@ export default function Login() {
           </div>
         ) : isBiometricScanning ? (
           <div className="bg-[#FEF3DC] border border-[#A05C00] text-[#A05C00] text-xs font-semibold px-4 py-2 rounded-xl mb-3 flex items-center gap-2">
-            <span className="animate-spin">⏳</span>
+            <Loader2 className="w-4 h-4 animate-spin stroke-[2]" />
             <span>Memindai Sidik Jari...</span>
           </div>
         ) : (
@@ -163,12 +176,18 @@ export default function Login() {
               key={key}
               onClick={() => handlePress(key)}
               className={`h-12 rounded-xl text-lg font-bold flex items-center justify-center active:scale-90 transition-all ${
-                key === '⌫' || key === '👆'
+                key === 'del' || key === 'bio'
                   ? 'bg-white text-[#1A6B4A] border border-[#D5E2DC] shadow-sm'
                   : 'bg-white text-[#111F1A] border border-[#D5E2DC] shadow-sm hover:border-[#1A6B4A]'
               }`}
             >
-              {key}
+              {key === 'bio' ? (
+                <Fingerprint className="w-5 h-5 text-[#1A6B4A] stroke-[2]" />
+              ) : key === 'del' ? (
+                <Delete className="w-5 h-5 text-[#4A6358] stroke-[2]" />
+              ) : (
+                key
+              )}
             </button>
           ))}
         </div>
@@ -178,12 +197,12 @@ export default function Login() {
       {/* ── FOOTER HELP ── */}
       <div className="py-3 px-5 text-center flex flex-col gap-1 border-t border-[#E2EBE7] bg-white">
         <button
-          onClick={() => setErrorMessage('Hubungi Sekretariat RT 05 melalui WhatsApp di +62 812-9876-5432 untuk verifikasi reset PIN.')}
-          className="text-xs text-[#1A6B4A] font-bold active:underline"
+          onClick={() => alert(`Bantuan Tarunesha:\nHubungi Sekretariat RT 05 melalui WhatsApp di +62 812-9876-5432 untuk reset PIN.`)}
+          className="text-xs text-[#1A6B4A] font-semibold active:underline"
         >
           Lupa PIN Pengamanan?
         </button>
-        <p className="text-xs text-[#5F7A6E]">
+        <p className="text-[10px] text-[#8FA89E]">
           Belum terdaftar?{' '}
           <button
             onClick={() => navigate('/daftar')}

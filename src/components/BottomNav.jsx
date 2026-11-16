@@ -3,16 +3,16 @@ import { Home, Landmark, Handshake, Wallet, User } from 'lucide-react'
 
 const menu = [
   { to: '/',        icon: Home,      label: 'Beranda' },
-  { to: '/kas',     icon: Landmark,  label: 'Kas RT' },
+  { to: '/kas',     icon: Landmark,  label: 'Kas RT'  },
   { to: '/layanan', icon: Handshake, label: 'Layanan' },
-  { to: '/dompet',  icon: Wallet,    label: 'Dompet' },
-  { to: '/profil',  icon: User,      label: 'Profil' },
+  { to: '/dompet',  icon: Wallet,    label: 'Dompet'  },
+  { to: '/profil',  icon: User,      label: 'Profil'  },
 ]
 
 export default function BottomNav() {
   return (
     <nav className="w-full z-40 bg-white border-t border-[#E2EBE7] shadow-[0_-4px_20px_rgba(0,0,0,0.04)] flex-shrink-0">
-      <div className="w-full grid grid-cols-5 pt-2 pb-3 sm:pb-2.5 px-1">
+      <div className="w-full grid grid-cols-5 pt-2 pb-2.5 sm:pb-3 px-1">
         {menu.map((m) => {
           const Icon = m.icon
           return (
@@ -21,30 +21,32 @@ export default function BottomNav() {
               to={m.to}
               end={m.to === '/'}
               className={({ isActive }) =>
-                `py-1 flex flex-col items-center justify-center gap-1 transition-all relative ${
-                  isActive ? 'text-[#1A6B4A]' : 'text-[#5F7A6E] hover:text-[#1A6B4A]'
+                `flex flex-col items-center justify-center py-1 transition-all group ${
+                  isActive ? 'text-[#1A6B4A]' : 'text-[#4A6358] hover:text-[#1A6B4A]'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <Icon
-                    size={22}
-                    strokeWidth={isActive ? 2.5 : 1.8}
-                    className={`transition-transform duration-150 ${
-                      isActive ? 'scale-110 drop-shadow-xs' : 'scale-100'
+                    className={`w-[22px] h-[22px] transition-transform duration-200 ${
+                      isActive ? 'scale-105 stroke-[2.2]' : 'stroke-[1.9]'
                     }`}
                   />
                   <span
-                    className={`text-xs transition-colors leading-none ${
-                      isActive ? 'font-bold text-[#1A6B4A]' : 'font-medium text-[#5F7A6E]'
+                    className={`text-[11px] mt-1 tracking-tight transition-colors ${
+                      isActive ? 'font-bold text-[#1A6B4A]' : 'font-medium text-[#4A6358]'
                     }`}
                   >
                     {m.label}
                   </span>
-                  {isActive && (
-                    <span className="absolute -bottom-1 w-6 h-1 bg-[#1A6B4A] rounded-full" />
-                  )}
+                  <div className="h-[3px] flex items-center justify-center mt-0.5">
+                    {isActive ? (
+                      <span className="w-5 h-[3px] bg-[#1A6B4A] rounded-full transition-all" />
+                    ) : (
+                      <span className="w-5 h-[3px] bg-transparent" />
+                    )}
+                  </div>
                 </>
               )}
             </NavLink>

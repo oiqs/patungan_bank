@@ -8,58 +8,24 @@
   --danger: #E84040;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-  box-sizing: border-box;
-}
+* { -webkit-tap-highlight-color: transparent; }
 
 body {
   font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  background: #DDE4E0;
-  color: #111F1A;
+  background: #E8EDE9;
   overflow-x: hidden;
-}
-
-/* Prevent auto-zoom on iOS Safari for input focus */
-input, select, textarea {
-  font-size: 16px;
 }
 
 /* Smooth scrolling & hide scrollbar */
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
-/* Keyframe Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
+/* Slide-up page animation */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes scaleUp {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-.animate-fade-in {
-  animation: fadeIn 200ms ease-out both;
-}
-
-.animate-slide-up {
-  animation: slideUp 250ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.animate-scale-up {
-  animation: scaleUp 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.page-enter {
-  animation: slideUp 240ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
+.page-enter { animation: slideUp 300ms cubic-bezier(.22,.68,0,1.2) both; }
 
 /* Press effect */
 .press:active { transform: scale(0.96); }
