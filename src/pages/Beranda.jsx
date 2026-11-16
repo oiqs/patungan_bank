@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { rp, shortRp } from '../lib/format'
 import Card from '../components/Card'
 import Button from '../components/Button'
+import NailongAvatar from '../components/NailongAvatar'
 import { useBankStore } from '../store/useBankStore'
 
 export default function Beranda() {
@@ -149,23 +150,26 @@ export default function Beranda() {
         {/* ── FITUR AI ASSISTANT CARD (HIGHLIGHT DOSEN) ── */}
         <div
           onClick={() => navigate('/ai-asisten')}
-          className="bg-gradient-to-r from-[#1A6B4A] via-[#237c56] to-[#2D8B63] rounded-2xl p-4 text-white flex items-center gap-3.5 cursor-pointer active:scale-98 transition-all shadow-md border border-white/20"
+          className="bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] rounded-2xl p-3.5 text-white flex items-center gap-3 cursor-pointer active:scale-98 transition-all shadow-md border border-white/20"
         >
-          <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center text-2xl flex-shrink-0 shadow-inner">
-            🤖
+          <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center p-1.5 flex-shrink-0 shadow-inner border border-white/20">
+            <NailongAvatar className="w-8 h-8" animated />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-sm">TaruAI Asisten Pintar</span>
-              <span className="text-[10px] bg-[#F5A623] text-black font-extrabold px-1.5 py-0.2 rounded-full">
-                AI Fitur
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="font-bold text-sm text-white tracking-tight">PatunganAI Asisten</span>
+              <span className="text-[9px] bg-[#F5A623] text-[#111F1A] font-extrabold px-2 py-0.5 rounded-full whitespace-nowrap leading-none shadow-sm">
+                AI
               </span>
             </div>
-            <p className="text-xs text-white/85 mt-0.5 leading-relaxed truncate">
-              Cek tagihan, simulasi cicilan tani & ringkas kas otomatis
+            <p className="text-[11px] text-white/80 leading-tight truncate">
+              Cek tagihan, simulasi cicilan & ringkas kas
             </p>
           </div>
-          <span className="text-white/80 font-bold text-sm">Tanya ›</span>
+          <div className="flex-shrink-0 bg-white/15 hover:bg-white/25 border border-white/20 rounded-full px-3 py-1.5 text-xs font-bold flex items-center gap-1 text-white shadow-sm active:scale-95 transition-all">
+            <span>Tanya</span>
+            <span className="text-xs">›</span>
+          </div>
         </div>
 
         {/* ── ALERT TAGIHAN JATUH TEMPO ── */}

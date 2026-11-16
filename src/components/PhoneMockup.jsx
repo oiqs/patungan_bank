@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useBankStore } from '../store/useBankStore'
 import AIAssistantModal from './AIAssistantModal'
+import NailongAvatar from './NailongAvatar'
 
 export default function PhoneMockup({ children }) {
   const [useFrame, setUseFrame] = useState(true)
@@ -110,15 +111,15 @@ export default function PhoneMockup({ children }) {
               <div className="w-full h-[100dvh] sm:h-[780px] bg-[#F4F7F5] relative select-text flex flex-col overflow-hidden">
                 {children}
 
-                {/* ════ ELEVATED FLOATING TARUAI BUTTON (ALWAYS PINNED ABOVE BOTTOM NAV) ════ */}
+                {/* ════ ELEVATED FLOATING PATUNGANAI BUTTON (ALWAYS PINNED ABOVE BOTTOM NAV) ════ */}
                 {!isDedicatedAiPage && (
                   <button
                     onClick={openAiModal}
-                    className="absolute bottom-[80px] right-3.5 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-3 pr-3.5 py-2.5 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-2 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
-                    title="Buka Asisten Pintar TaruAI"
+                    className="absolute bottom-[80px] right-3.5 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
+                    title="Buka Asisten Pintar PatunganAI"
                   >
-                    <span className="text-base animate-bounce">🤖</span>
-                    <span className="tracking-wide">TaruAI</span>
+                    <NailongAvatar className="w-5 h-5" animated />
+                    <span className="tracking-wide">PatunganAI</span>
                     <span className="w-2 h-2 rounded-full bg-[#4DB87F] shadow-[0_0_8px_#4DB87F]" />
                   </button>
                 )}
@@ -140,10 +141,10 @@ export default function PhoneMockup({ children }) {
           {!isDedicatedAiPage && (
             <button
               onClick={openAiModal}
-              className="absolute bottom-[80px] right-3.5 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-3 pr-3.5 py-2.5 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-2 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
+              className="absolute bottom-[80px] right-3.5 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
             >
-              <span className="text-base animate-bounce">🤖</span>
-              <span>TaruAI</span>
+              <NailongAvatar className="w-5 h-5" animated />
+              <span>PatunganAI</span>
               <span className="w-2 h-2 rounded-full bg-[#4DB87F] shadow-[0_0_8px_#4DB87F]" />
             </button>
           )}

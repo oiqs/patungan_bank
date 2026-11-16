@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { rp, shortRp } from '../lib/format'
 import { useBankStore } from '../store/useBankStore'
+import NailongAvatar from './NailongAvatar'
 
 export default function AIAssistantModal({ isOpen, onClose }) {
   const navigate = useNavigate()
@@ -23,7 +24,7 @@ export default function AIAssistantModal({ isOpen, onClose }) {
     {
       id: 'm1',
       sender: 'ai',
-      text: `Halo ${currentUser.nama}! 👋 Saya Asisten AI Tarunesha. Ada yang bisa saya bantu terkait tagihan iuran, kas RT, arisan, atau pembiayaan usaha tani?`,
+      text: `Halo ${currentUser.nama}! 👋 Aku PatunganAI, asisten pintar Patungan Bank Tarunesha. Ada yang bisa aku bantu seputar tagihan iuran, kas RT, arisan, atau pembiayaan usaha?`,
       time: 'Baru saja',
     }
   ])
@@ -176,15 +177,15 @@ export default function AIAssistantModal({ isOpen, onClose }) {
         {/* Header Asisten AI */}
         <div className="bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] px-5 py-4 text-white flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center text-xl shadow-inner">
-              🤖
+            <div className="w-10 h-10 rounded-2xl bg-white/20 border border-white/30 flex items-center justify-center p-1 shadow-inner">
+              <NailongAvatar className="w-7 h-7" animated />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <h3 className="font-extrabold text-sm">TaruAI Asisten Pintar</h3>
+                <h3 className="font-extrabold text-sm">PatunganAI Asisten</h3>
                 <span className="w-2 h-2 rounded-full bg-[#4DB87F] animate-pulse" />
               </div>
-              <p className="text-[11px] text-white/80">AI Keuangan Komunitas Tarunesha</p>
+              <p className="text-[11px] text-white/80">Asisten Cerdas Keuangan Tarunesha</p>
             </div>
           </div>
           <button
@@ -249,8 +250,9 @@ export default function AIAssistantModal({ isOpen, onClose }) {
 
           {/* AI Typing indicator */}
           {isTyping && (
-            <div className="flex items-center gap-2 text-xs text-[#8FA89E] bg-white border border-[#E2EBE7] px-3.5 py-2.5 rounded-2xl rounded-tl-none w-28">
-              <span className="font-bold text-[#1A6B4A]">TaruAI</span>
+            <div className="flex items-center gap-2 text-xs text-[#8FA89E] bg-white border border-[#E2EBE7] px-3.5 py-2 rounded-2xl rounded-tl-none w-36 shadow-sm">
+              <NailongAvatar className="w-4 h-4" animated />
+              <span className="font-bold text-[#1A6B4A]">PatunganAI</span>
               <span className="flex gap-1 items-center">
                 <span className="w-1.5 h-1.5 bg-[#1A6B4A] rounded-full animate-bounce" />
                 <span className="w-1.5 h-1.5 bg-[#1A6B4A] rounded-full animate-bounce [animation-delay:0.2s]" />

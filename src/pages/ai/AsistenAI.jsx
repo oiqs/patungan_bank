@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { rp, shortRp } from '../../lib/format'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
+import NailongAvatar from '../../components/NailongAvatar'
 import { useBankStore } from '../../store/useBankStore'
 
 export default function AsistenAI() {
@@ -24,7 +25,7 @@ export default function AsistenAI() {
     {
       id: 'm1',
       sender: 'ai',
-      text: `Halo ${currentUser.nama}! 👋 Saya Asisten AI Tarunesha. Saya siap membantu Anda mengecek tagihan iuran, menghitung simulasi pinjaman pertanian, memantau transparansi kas RT, atau jadwal arisan.`,
+      text: `Halo ${currentUser.nama}! 👋 Aku PatunganAI, asisten pintar Patungan Bank Tarunesha. Aku siap membantu Anda mengecek tagihan iuran, menghitung simulasi pinjaman, memantau transparansi kas RT, atau jadwal arisan!`,
       time: '12:00',
     }
   ])
@@ -166,18 +167,20 @@ export default function AsistenAI() {
   return (
     <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12 pb-24">
       {/* Top Header */}
-      <div className="bg-white px-5 py-4 border-b border-[#E2EBE7] flex items-center gap-3 sticky top-0 z-10">
-        <button onClick={() => navigate(-1)} className="text-[#1A6B4A] font-bold active:scale-95 transition-transform">←</button>
+      <div className="bg-white px-5 py-3.5 border-b border-[#E2EBE7] flex items-center gap-3 sticky top-0 z-10 shadow-sm">
+        <button onClick={() => navigate(-1)} className="text-[#1A6B4A] font-bold text-lg active:scale-95 transition-transform">←</button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-[#111F1A] font-extrabold text-base">TaruAI Asisten Warga</h1>
+            <h1 className="text-[#111F1A] font-extrabold text-base">PatunganAI Asisten</h1>
             <span className="text-[10px] font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2 py-0.5 rounded-full">
               Online
             </span>
           </div>
           <p className="text-[11px] text-[#8FA89E]">Asisten Cerdas Keuangan & Gotong Royong</p>
         </div>
-        <span className="text-2xl">🤖</span>
+        <div className="w-9 h-9 rounded-2xl bg-[#FEF3DC] border border-[#F5A623]/30 flex items-center justify-center p-1 shadow-sm">
+          <NailongAvatar className="w-7 h-7" animated />
+        </div>
       </div>
 
       {/* Prompts Bar */}
@@ -233,8 +236,9 @@ export default function AsistenAI() {
         ))}
 
         {isTyping && (
-          <div className="flex items-center gap-2 text-xs text-[#8FA89E] bg-white border border-[#E2EBE7] px-3.5 py-2.5 rounded-2xl rounded-tl-none w-28">
-            <span className="font-bold text-[#1A6B4A]">TaruAI</span>
+          <div className="flex items-center gap-2 text-xs text-[#8FA89E] bg-white border border-[#E2EBE7] px-3.5 py-2 rounded-2xl rounded-tl-none w-36 shadow-sm">
+            <NailongAvatar className="w-4 h-4" animated />
+            <span className="font-bold text-[#1A6B4A]">PatunganAI</span>
             <span className="flex gap-1 items-center">
               <span className="w-1.5 h-1.5 bg-[#1A6B4A] rounded-full animate-bounce" />
               <span className="w-1.5 h-1.5 bg-[#1A6B4A] rounded-full animate-bounce [animation-delay:0.2s]" />
