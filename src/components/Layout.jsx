@@ -1,16 +1,18 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import BottomNav from './BottomNav'
 
 export default function Layout() {
-    return (
-        <div className="max-w-md mx-auto min-h-screen bg-gray-100 pb-24">
-            <header className="sticky top-0 bg-emerald-800 text-white px-4 py-3 font-bold">
-                Patungan Bank
-            </header>
-            <main className="p-4">
-                <Outlet />
-            </main>
-            <BottomNav />
-        </div>
-    )
+  const { pathname } = useLocation()
+
+  return (
+    <div className="w-full h-full flex-1 flex flex-col overflow-hidden relative">
+      {/* ── SCROLLABLE PAGE CONTENT (ONLY MAIN SCROLLS) ── */}
+      <main key={pathname} className="flex-1 overflow-y-auto no-scrollbar page-enter pb-6">
+        <Outlet />
+      </main>
+
+      {/* ── PINNED BOTTOM NAVIGATION (ALWAYS VISIBLE AT ALL TIMES) ── */}
+      <BottomNav />
+    </div>
+  )
 }

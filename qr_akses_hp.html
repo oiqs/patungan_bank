@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akses Patungan Bank di HP</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #F4F7F5;
+      color: #111F1A;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .card {
+      background: white;
+      border-radius: 28px;
+      padding: 32px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border: 1px solid #E2EBE7;
+      text-align: center;
+    }
+    h1 {
+      font-size: 24px;
+      color: #1A6B4A;
+      margin-top: 0;
+      margin-bottom: 6px;
+    }
+    p {
+      color: #4A6358;
+      font-size: 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .qr-box {
+      background: #F4F7F5;
+      padding: 20px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 24px;
+      border: 2px solid #E2EBE7;
+    }
+    .qr-box img {
+      width: 220px;
+      height: 220px;
+      display: block;
+    }
+    .url-box {
+      background: #E8F4EE;
+      border: 1px solid #1A6B4A;
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1A6B4A;
+      word-break: break-all;
+      margin-bottom: 16px;
+    }
+    .badge {
+      display: inline-block;
+      background: #E6F4EE;
+      color: #1A6B4A;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+    .alt-list {
+      text-align: left;
+      font-size: 12px;
+      color: #4A6358;
+      background: #FAFAFA;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #E2EBE7;
+    }
+    .alt-list strong { color: #111F1A; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">🌐 Akses Online & HP</span>
+    <h1>Buka di HP / Bagikan ke Dosen</h1>
+    <p>Arahkan kamera HP ke QR Code di bawah atau salin tautan untuk membuka desain aplikasi <strong>Patungan Bank</strong> di HP Anda:</p>
+
+    <!-- QR Code generated via free Google Charts API -->
+    <div class="qr-box">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=https://nothing-sec-winter-quarterly.trycloudflare.com" alt="QR Code Akses HP">
+    </div>
+
+    <div class="url-box">
+      https://nothing-sec-winter-quarterly.trycloudflare.com
+    </div>
+
+    <div class="alt-list">
+      <p style="margin: 0 0 8px 0;"><strong>📱 Cara Penggunaan:</strong></p>
+      1. Buka kamera HP ➜ scan QR code di atas, atau ketik langsung tautan di Chrome/Safari.<br>
+      2. Tautan di atas adalah link publik resmi HTTPS (Cloudflare), bisa dikirim ke WhatsApp teman / dosen untuk langsung di-review.<br>
+      3. Jika satu jaringan Wi-Fi lokal dengan laptop, Anda juga dapat membuka: <strong>http://192.168.18.38:5175/</strong>
+    </div>
+  </div>
+</body>
+</html>

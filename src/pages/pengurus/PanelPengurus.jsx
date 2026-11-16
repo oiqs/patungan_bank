@@ -1,0 +1,251 @@
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Card from '../../components/Card'
+import Button from '../../components/Button'
+import { rp } from '../../lib/format'
+import { useBankStore } from '../../store/useBankStore'
+
+export default function PanelPengurus() {
+  const navigate = useNavigate()
+  const {
+    currentUser,
+    kasSaldo,
+    anggotaList,
+    verifikasiPembayaranPending,
+    pengajuanPinjamanPending,
+    kasKeluarPending,
+    verifikasiPembayaranAction,
+    persetujuanPinjamanAction,
+  } = useBankStore()
+
+  const [pesanSukses, setPesanSukses] = useState('')
+
+  const handleVerif = (id, setujui) => {
+    verifikasiPembayaranAction(id, setujui)
+    setPesanSukses(setujui ? 'Pembayaran berhasil diverifikasi dan masuk kas!' : 'Pembayaran ditolak.')
+    setTimeout(() => setPesanSukses(''), 2500)
+  }
+
+  const handlePersetujuanPinjaman = (id, setujui) => {
+    persetujuanPinjamanAction(id, setujui)
+    setPesanSukses(setujui ? 'Pinjaman disetujui & dicairkan!' : 'Pengajuan pinjaman ditolak.')
+    setTimeout(() => setPesanSukses(''), 2500)
+  }
+
+  const anggotaMenunggak = anggotaList.filter(a => a.statusIuran === 'belum').length
+
+  return (
+    <div className="w-full flex-1 flex flex-col pb-24">
+      {/* ── HEADER PANEL PENGURUS ── */}
+      <div className="bg-gradient-to-br from-[#0D4A33] via-[#1A6B4A] to-[#207552] pt-12 pb-5 px-5 text-white shadow-sm rounded-b-[28px]">
+        {/* Top Nav Row: Back button & Action button */}
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={() => navigate('/')}
+            className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-sm font-bold active:scale-90 transition-all border border-white/20"
+            title="Kembali ke Beranda"
+          >
+            ←
+          </button>
+
+          <button
+            onClick={() => navigate('/pengurus/anggota')}
+            className="bg-white/15 hover:bg-white/25 border border-white/25 rounded-full px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 active:scale-95 transition-all shadow-sm"
+          >
+            <span>👥</span>
+            <span>Kelola Anggota</span>
+          </button>
+        </div>
+
+        {/* Main Title & Role Badge */}
+        <div className="flex items-center gap-2 mb-1.5">
+          <div className="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1 backdrop-blur-sm border border-white/20">
+            <span className="text-sm">👑</span>
+            <span className="text-white text-xs font-bold tracking-tight">Panel Pengurus</span>
+            <span className="text-[10px] bg-[#F5A623] text-[#111F1A] font-extrabold px-2 py-0.5 rounded-full">
+              {currentUser.peran}
+            </span>
+          </div>
+        </div>
+
+        <h1 className="text-lg font-extrabold text-white tracking-tight">
+          Pusat Kendali Pengurus
+        </h1>
+        <p className="text-white/80 text-xs mt-0.5 leading-relaxed">
+          Kelola kas, verifikasi setoran & persetujuan pinjaman warga
+        </p>
+      </div>
+
+      <div className="flex-1 px-4 py-4 flex flex-col gap-4">
+        {/* Pesan Aksi */}
+        {pesanSukses && (
+          <div className="bg-[#E6F4EE] border border-[#1A6B4A]/30 text-[#1A6B4A] text-xs font-bold p-3 rounded-2xl animate-fade-in text-center">
+            {pesanSukses}
+          </div>
+        )}
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-2.5">
+          {[
+            { label: 'Kas Tarunesha', value: rp(kasSaldo), emoji: '💰', color: 'text-[#1A6B4A]' },
+            { label: 'Menunggak Iuran', value: `${anggotaMenunggak} warga`, emoji: '⚠️', color: 'text-[#E84040]' },
+            { label: 'Verifikasi Setoran', value: `${verifikasiPembayaranPending.length} pending`, emoji: '📋', color: 'text-[#F5A623]' },
+            { label: 'Pengajuan Modal', value: `${pengajuanPinjamanPending.length} ajuan`, emoji: '🌾', color: 'text-[#2D8B63]' },
+          ].map((s, i) => (
+            <Card key={i} className="p-3.5 flex flex-col gap-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-base">{s.emoji}</span>
+                <p className="text-[10px] font-bold text-[#8FA89E] uppercase tracking-wider">{s.label}</p>
+              </div>
+              <p className={`text-base font-extrabold ${s.color}`}>{s.value}</p>
+            </Card>
+          ))}
+        </div>
+
+        {/* Quick Actions Bar */}
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => navigate('/pengurus/kas-keluar')}
+            className="py-2.5"
+          >
+            🧾 + Input Kas Keluar
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => navigate('/pengurus/bantuan-tunai')}
+            className="py-2.5"
+          >
+            💵 + Mode Bantuan Tunai
+          </Button>
+        </div>
+
+        {/* Verifikasi Pembayaran */}
+        <div>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest">
+              Verifikasi Pembayaran Masuk
+            </p>
+            <span className="text-xs bg-[#F5A623] text-white font-bold px-2 py-0.5 rounded-full">
+              {verifikasiPembayaranPending.length}
+            </span>
+          </div>
+
+          {verifikasiPembayaranPending.length === 0 ? (
+            <Card className="p-5 text-center">
+              <p className="text-sm font-semibold text-[#1A6B4A]">✅ Semua setoran telah diverifikasi</p>
+            </Card>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {verifikasiPembayaranPending.map((v) => (
+                <Card key={v.id} className="p-3.5 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#E6F4EE] flex items-center justify-center text-sm font-bold text-[#1A6B4A] flex-shrink-0">
+                    {v.nama.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-bold text-[#111F1A] truncate">{v.nama}</p>
+                    <p className="text-[11px] text-[#8FA89E] mt-0.5">{v.jenis} · <strong className="text-[#1A6B4A]">{rp(v.jumlah)}</strong></p>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => handleVerif(v.id, true)}
+                      title="Setujui"
+                      className="w-8 h-8 rounded-full bg-[#E6F4EE] text-[#1A6B4A] font-bold flex items-center justify-center text-sm active:scale-90"
+                    >
+                      ✓
+                    </button>
+                    <button
+                      onClick={() => handleVerif(v.id, false)}
+                      title="Tolak"
+                      className="w-8 h-8 rounded-full bg-red-50 text-[#E84040] font-bold flex items-center justify-center text-sm active:scale-90"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Pengajuan Pinjaman */}
+        <div>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest">
+              Persetujuan Pinjaman Modal (Ketua)
+            </p>
+            <span className="text-xs bg-[#1A6B4A] text-white font-bold px-2 py-0.5 rounded-full">
+              {pengajuanPinjamanPending.length}
+            </span>
+          </div>
+
+          {pengajuanPinjamanPending.length === 0 ? (
+            <Card className="p-5 text-center">
+              <p className="text-sm text-[#8FA89E]">Tidak ada pengajuan pinjaman yang menunggu</p>
+            </Card>
+          ) : (
+            <div className="flex flex-col gap-2.5">
+              {pengajuanPinjamanPending.map((p) => (
+                <Card key={p.id} className="p-4 space-y-2.5">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-[#111F1A]">{p.nama}</p>
+                      <p className="text-xs text-[#8FA89E]">{p.jenis} · Tenor {p.tenor}</p>
+                    </div>
+                    <span className="text-sm font-extrabold text-[#1A6B4A]">{rp(p.nominal)}</span>
+                  </div>
+
+                  <p className="text-xs text-[#4A6358] bg-[#F4F7F5] p-2.5 rounded-xl">
+                    <strong>Tujuan:</strong> {p.tujuan}
+                  </p>
+
+                  <div className="flex gap-2 pt-1">
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      full
+                      onClick={() => handlePersetujuanPinjaman(p.id, true)}
+                    >
+                      ✓ Setujui & Cairkan
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePersetujuanPinjaman(p.id, false)}
+                    >
+                      Tolak
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Kas Keluar Pending */}
+        <div>
+          <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2 px-1">
+            Kas Keluar Terkini
+          </p>
+          {kasKeluarPending.map((k) => (
+            <Card key={k.id} className="p-3.5 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#E2EBE7] flex items-center justify-center text-xl flex-shrink-0">
+                🧾
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-[#111F1A]">{k.keperluan}</p>
+                <p className="text-[11px] text-[#8FA89E]">Nominal: {rp(k.nominal)} · Nota: {k.nota}</p>
+              </div>
+              <span className="text-[10px] font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2 py-0.5 rounded-full">
+                Sesuai RAB
+              </span>
+            </Card>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  )
+}
