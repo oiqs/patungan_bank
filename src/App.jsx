@@ -1,16 +1,21 @@
-import Button from './components/Button'
-import Card from './components/Card'
-import { rp } from './lib/format'
+import { Routes, Route } from 'react-router-dom'
+import Layout from './components/Layout'
+import Beranda from './pages/Beranda'
+import Kas from './pages/Kas'
+import Layanan from './pages/Layanan'
+import Dompet from './pages/Dompet'
+import Profil from './pages/Profil'
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-100 p-4 space-y-3">
-      <Card>
-        <p className="text-sm text-gray-500">Saldo Kas</p>
-        <p className="text-2xl font-bold">{rp(4850000)}</p>
-      </Card>
-      <Button>Bayar Iuran</Button>
-      <Button variant="secondary">Lihat Laporan</Button>
-    </div>
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<Beranda />} />
+        <Route path="/kas" element={<Kas />} />
+        <Route path="/layanan" element={<Layanan />} />
+        <Route path="/dompet" element={<Dompet />} />
+        <Route path="/profil" element={<Profil />} />
+      </Route>
+    </Routes>
   )
 }

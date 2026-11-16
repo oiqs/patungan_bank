@@ -1,15 +1,32 @@
-export default function Button({ children, onClick, variant = 'primary', disabled }) {
-    const style =
-        variant === 'primary'
-            ? 'bg-amber-400 text-emerald-950'
-            : 'bg-white border border-gray-200 text-gray-800'
+import { NavLink } from 'react-router-dom'
+
+const menu = [
+    { to: '/', icon: '🏠', label: 'Beranda' },
+    { to: '/kas', icon: '📒', label: 'Kas' },
+    { to: '/layanan', icon: '🧰', label: 'Layanan' },
+    { to: '/dompet', icon: '👛', label: 'Dompet' },
+    { to: '/profil', icon: '👤', label: 'Profil' },
+]
+
+export default function BottomNav() {
     return (
-        <button
-            onClick={onClick}
-            disabled={disabled}
-            className={`w-full rounded-xl py-3 font-semibold active:scale-95 transition disabled:opacity-40 ${style}`}
-        >
-            {children}
-        </button>
+        <nav className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200">
+            <div className="max-w-md mx-auto grid grid-cols-5">
+                {menu.map((m) => (
+                    <NavLink
+                        key={m.to}
+                        to={m.to}
+                        end={m.to === '/'}
+                        className={({ isActive }) =>
+                            `py-2 text-xs flex flex-col items-center ${isActive ? 'text-emerald-700 font-bold' : 'text-gray-500'
+                            }`
+                        }
+                    >
+                        <span className="text-xl">{m.icon}</span>
+                        {m.label}
+                    </NavLink>
+                ))}
+            </div>
+        </nav>
     )
 }
