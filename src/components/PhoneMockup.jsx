@@ -117,7 +117,7 @@ export default function PhoneMockup({ children }) {
                 {!isDedicatedAiPage && (
                   <button
                     onClick={openAiModal}
-                    className="absolute bottom-[80px] right-3.5 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
+                    className="absolute bottom-[104px] right-4 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
                     title="Buka Asisten Pintar patuAI"
                   >
                     <NailongAvatar className="w-5 h-5" animated />
@@ -143,7 +143,7 @@ export default function PhoneMockup({ children }) {
           {!isDedicatedAiPage && (
             <button
               onClick={openAiModal}
-              className="absolute bottom-[80px] right-3.5 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
+              className="absolute bottom-[104px] right-4 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
             >
               <NailongAvatar className="w-5 h-5" animated />
               <span>patuAI</span>
