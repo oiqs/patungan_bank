@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 const INITIAL_TAGIHAN = [
-  { id: 't-nov26', bln: 'Nov', thn: '2026', judul: 'Iuran Wajib November 2026', nominal: 10000, jatuhTempo: '20 Nov 2026', status: 'belum', telat: false },
   { id: 't-okt26', bln: 'Okt', thn: '2026', judul: 'Iuran Wajib Oktober 2026', nominal: 10000, jatuhTempo: '20 Okt 2026', status: 'belum', telat: true },
+  { id: 't-nov26', bln: 'Nov', thn: '2026', judul: 'Iuran Wajib November 2026', nominal: 10000, jatuhTempo: '20 Nov 2026', status: 'belum', telat: false },
   { id: 't-sep26', bln: 'Sep', thn: '2026', judul: 'Iuran Wajib September 2026', nominal: 10000, jatuhTempo: '20 Sep 2026', status: 'lunas', telat: false },
   { id: 't-agu26', bln: 'Agu', thn: '2026', judul: 'Iuran Wajib Agustus 2026', nominal: 10000, jatuhTempo: '20 Agu 2026', status: 'lunas', telat: false },
   { id: 't-jul26', bln: 'Jul', thn: '2026', judul: 'Iuran Wajib Juli 2026', nominal: 10000, jatuhTempo: '20 Jul 2026', status: 'pending', telat: false },
@@ -119,6 +119,10 @@ export const useBankStore = create(
       toggleFingerprint: () => set((state) => ({
         currentUser: { ...state.currentUser, fingerprintAktif: !state.currentUser.fingerprintAktif }
       })),
+
+      // --- PENGATURAN MODE DEMO / DOSEN ---
+      isDemoMode: false,
+      toggleDemoMode: () => set((state) => ({ isDemoMode: !state.isDemoMode })),
 
       // --- KEUANGAN UTAMA ---
       dompetSaldo: 125000,

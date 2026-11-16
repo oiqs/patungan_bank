@@ -178,12 +178,12 @@ export default function Login() {
       {/* ── FOOTER HELP ── */}
       <div className="py-3 px-5 text-center flex flex-col gap-1 border-t border-[#E2EBE7] bg-white">
         <button
-          onClick={() => alert(`Bantuan Tarunesha:\nHubungi Sekretariat RT 05 melalui WhatsApp di +62 812-9876-5432 untuk reset PIN.`)}
-          className="text-xs text-[#1A6B4A] font-semibold active:underline"
+          onClick={() => setErrorMessage('Hubungi Sekretariat RT 05 melalui WhatsApp di +62 812-9876-5432 untuk verifikasi reset PIN.')}
+          className="text-xs text-[#1A6B4A] font-bold active:underline"
         >
           Lupa PIN Pengamanan?
         </button>
-        <p className="text-[10px] text-[#8FA89E]">
+        <p className="text-xs text-[#5F7A6E]">
           Belum terdaftar?{' '}
           <button
             onClick={() => navigate('/daftar')}

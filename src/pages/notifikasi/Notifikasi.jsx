@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/Card'
 import { useBankStore } from '../../store/useBankStore'
+import { ArrowLeft, Bell, ChevronRight, CheckCheck } from 'lucide-react'
 
 export default function Notifikasi() {
   const navigate = useNavigate()
@@ -9,29 +10,37 @@ export default function Notifikasi() {
   const unreadCount = notifikasi.filter(n => !n.dibaca).length
 
   return (
-    <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12 pb-24">
+    <div className="w-full h-full flex flex-col bg-[#F4F7F5] overflow-y-auto no-scrollbar pb-24">
       {/* Topbar */}
-      <div className="bg-white px-5 py-4 border-b border-[#E2EBE7] flex items-center justify-between sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate(-1)} className="text-[#1A6B4A] font-bold active:scale-95 transition-transform">←</button>
+      <div className="bg-white px-4 py-3.5 border-b border-[#E2EBE7] flex items-center justify-between sticky top-0 z-10 pt-12">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-[#1A6B4A] hover:bg-[#E6F4EE] active:scale-95 transition-all"
+            aria-label="Kembali"
+          >
+            <ArrowLeft size={22} />
+          </button>
           <h1 className="text-[#111F1A] font-bold text-base">Notifikasi</h1>
         </div>
         {unreadCount > 0 && (
           <button
             onClick={markAllNotifAsRead}
-            className="text-xs text-[#1A6B4A] font-semibold active:scale-95 transition-transform"
+            className="text-xs text-[#1A6B4A] font-bold flex items-center gap-1 active:scale-95 transition-transform"
           >
-            Tandai semua dibaca
+            <CheckCheck size={16} /> Tandai Dibaca
           </button>
         )}
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="px-4 py-4 space-y-3">
         {notifikasi.length === 0 ? (
           <div className="text-center py-16">
-            <span className="text-4xl">🔔</span>
-            <p className="text-sm font-bold text-[#111F1A] mt-2">Belum ada notifikasi</p>
-            <p className="text-xs text-[#8FA89E] mt-1">Pemberitahuan tagihan dan info rapat akan muncul di sini</p>
+            <div className="w-14 h-14 rounded-2xl bg-white border border-[#E2EBE7] flex items-center justify-center mx-auto text-[#5F7A6E]">
+              <Bell size={28} />
+            </div>
+            <p className="text-base font-bold text-[#111F1A] mt-3">Belum ada pemberitahuan</p>
+            <p className="text-xs text-[#5F7A6E] mt-1">Pemberitahuan tagihan dan info rapat warga akan muncul di sini</p>
           </div>
         ) : (
           notifikasi.map((item) => (
@@ -44,12 +53,13 @@ export default function Notifikasi() {
             >
               <div className="flex items-start justify-between gap-2">
                 <p className="text-sm font-bold text-[#111F1A]">{item.judul}</p>
-                <span className="text-[10px] text-[#8FA89E] whitespace-nowrap">{item.tgl}</span>
+                <span className="text-xs text-[#5F7A6E] whitespace-nowrap">{item.tgl}</span>
               </div>
-              <p className="text-xs text-[#4A6358] mt-1 leading-relaxed">{item.pesan}</p>
+              <p className="text-xs text-[#456355] mt-1 leading-relaxed">{item.pesan}</p>
               {item.link && (
-                <div className="mt-2.5 flex items-center gap-1 text-[11px] font-bold text-[#1A6B4A]">
-                  Lihat detail <span>→</span>
+                <div className="mt-2.5 flex items-center gap-1 text-xs font-bold text-[#1A6B4A]">
+                  <span>Buka Menu Terkait</span>
+                  <ChevronRight size={14} />
                 </div>
               )}
             </Card>

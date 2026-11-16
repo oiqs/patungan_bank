@@ -4,6 +4,22 @@ import Card from '../components/Card'
 import Button from '../components/Button'
 import NailongAvatar from '../components/NailongAvatar'
 import { useBankStore } from '../store/useBankStore'
+import {
+  Bell,
+  CreditCard,
+  Shuffle,
+  HandCoins,
+  Heart,
+  AlertCircle,
+  CheckCircle2,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownLeft,
+  ChevronRight,
+  ShieldAlert,
+  Wallet,
+  Users
+} from 'lucide-react'
 
 export default function Beranda() {
   const navigate = useNavigate()
@@ -12,196 +28,267 @@ export default function Beranda() {
     kasSaldo,
     kasBulanIniMasuk,
     kasBulanIniKeluar,
+    dompetSaldo,
     tagihanIuran,
     transaksi,
     notifikasi
   } = useBankStore()
 
-  const tagihanTertunggak = tagihanIuran.find(t => t.status === 'belum')
+  // Prioritaskan tagihan yang terlambat duluan, baru tagihan belum lunas lainnya
+  const tagihanTertunggak = [...tagihanIuran]
+    .filter(t => t.status === 'belum' || t.status === 'telat')
+    .sort((a, b) => (b.telat ? 1 : 0) - (a.telat ? 1 : 0))[0]
+
   const unreadNotif = notifikasi.filter(n => !n.dibaca).length
 
   const pintasan = [
-    { icon: '💳', label: 'Bayar Iuran', bg: 'bg-[#E6F4EE]', to: '/kas' },
-    { icon: '🎲', label: 'Arisan',      bg: 'bg-[#FEF3DC]', to: '/layanan/arisan' },
-    { icon: '🏦', label: 'Pinjaman',    bg: 'bg-[#E8EEF9]', to: '/layanan/ajukan-pinjaman' },
-    { icon: '❤️', label: 'Donasi',      bg: 'bg-[#FAEAEA]', to: '/layanan/kegiatan' },
+    { icon: CreditCard, label: 'Bayar Iuran', bg: 'bg-[#E6F4EE]', color: 'text-[#1A6B4A]', to: '/kas' },
+    { icon: Shuffle,    label: 'Arisan RT',   bg: 'bg-[#FEF3DC]', color: 'text-[#A05C00]', to: '/layanan/arisan' },
+    { icon: HandCoins,  label: 'Pinjaman',    bg: 'bg-[#E8EEF9]', color: 'text-[#2B5EA7]', to: '/layanan' },
+    { icon: Heart,      label: 'Dana Sosial', bg: 'bg-[#FAEAEA]', color: 'text-[#C93535]', to: '/layanan/kegiatan?tab=sosial' },
   ]
 
   const isPengurus = ['Bendahara', 'Ketua', 'Sekretaris'].includes(currentUser.peran)
 
   return (
-    <div className="w-full">
+    <div className="w-full pb-24">
 
-      {/* ── HEADER HERO ── */}
-      <div className="bg-gradient-to-br from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] pt-12 pb-7 px-5 rounded-b-[32px]">
-
-        {/* Top row */}
-        <div className="flex items-center justify-between mb-5">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <p className="text-white/70 text-xs font-medium">Halo, 👋</p>
-              <span className="text-[10px] bg-white/20 text-white font-bold px-2 py-0.5 rounded-full">
-                {currentUser.peran}
-              </span>
-            </div>
-            <p className="text-white text-lg font-bold leading-tight mt-0.5">{currentUser.nama}</p>
-          </div>
-          <div className="flex gap-2 items-center">
-            <button
-              onClick={() => navigate('/notifikasi')}
-              className="relative w-9 h-9 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-base active:scale-90 transition-transform"
-            >
-              🔔
-              {unreadNotif > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#F5A623] rounded-full border-2 border-[#1A6B4A]" />
-              )}
-            </button>
+      {/* ── HEADER HIJAU SOLID ── */}
+      <div className="bg-[#1A6B4A] pt-12 pb-6 px-5 text-white shadow-sm">
+        
+        {/* Top bar: Profil & Notifikasi */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
             <div
               onClick={() => navigate('/profil')}
-              className="w-9 h-9 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-base cursor-pointer active:scale-90 transition-transform"
+              className="w-12 h-12 rounded-2xl bg-white/20 border-2 border-white/40 flex items-center justify-center text-xl cursor-pointer active:scale-95 transition-transform"
             >
               {currentUser.avatar || '👤'}
             </div>
-          </div>
-        </div>
-
-        {/* Balance card */}
-        <div className="bg-white/10 border border-white/20 rounded-2xl p-5 backdrop-blur-sm">
-          {/* Top row: Label & Status Badge */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#4DB87F] shadow-[0_0_8px_#4DB87F]" />
-              <p className="text-white/70 text-[11px] font-semibold uppercase tracking-wider">
-                Kas Tarunesha RT 05
-              </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-white/90 text-sm font-medium">Selamat datang,</span>
+                <span className="text-xs bg-[#4DB87F] text-[#0D4A33] font-bold px-2 py-0.5 rounded-full">
+                  {currentUser.peran}
+                </span>
+              </div>
+              <h2 className="text-white text-lg font-extrabold leading-tight tracking-tight">
+                {currentUser.nama}
+              </h2>
             </div>
-            {tagihanTertunggak ? (
-              <span
-                onClick={() => navigate('/kas')}
-                className="bg-[#F5A623]/25 border border-[#F5A623]/50 text-[#FDD280] text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap cursor-pointer active:scale-95 transition-transform flex items-center gap-1 shadow-sm"
-              >
-                <span>⚠️</span>
-                <span>Ada Tagihan</span>
-              </span>
-            ) : (
-              <span className="bg-[#4DB87F]/25 border border-[#4DB87F]/50 text-[#A6E8C2] text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap flex items-center gap-1 shadow-sm">
-                <span>✓</span>
-                <span>Semua Lunas</span>
-              </span>
+          </div>
+
+          <button
+            onClick={() => navigate('/notifikasi')}
+            className="relative w-11 h-11 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white active:scale-90 transition-transform"
+            aria-label="Notifikasi"
+          >
+            <Bell size={20} />
+            {unreadNotif > 0 && (
+              <span className="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-[#F5A623] rounded-full border-2 border-[#1A6B4A]" />
             )}
-          </div>
-
-          {/* Saldo Nominal (Full width, lega & tidak berhimpitan) */}
-          <p className="text-white text-3xl font-extrabold tracking-tight mt-1 mb-1">{rp(kasSaldo)}</p>
-          <p className="text-white/60 text-xs">Transparan & dapat dipantau seluruh warga</p>
-
-          <div className="flex gap-4 mt-4 pt-4 border-t border-white/15">
-            <div className="flex-1">
-              <p className="text-white/55 text-[10px] font-semibold uppercase tracking-wider mb-1">Pemasukan Bulan Ini</p>
-              <p className="text-[#4DB87F] text-sm font-bold">↑ {shortRp(kasBulanIniMasuk)}</p>
-            </div>
-            <div className="w-px bg-white/20" />
-            <div className="flex-1">
-              <p className="text-white/55 text-[10px] font-semibold uppercase tracking-wider mb-1">Pengeluaran Bulan Ini</p>
-              <p className="text-[#FF8080] text-sm font-bold">↓ {shortRp(kasBulanIniKeluar)}</p>
-            </div>
-          </div>
+          </button>
         </div>
+
+        {/* ── DOMPET SAYA (UANG PRIBADI WARGA) ── */}
+        <div className="bg-[#124E35] rounded-2xl p-4 border border-white/15 flex items-center justify-between shadow-xs">
+          <div>
+            <div className="flex items-center gap-1.5 text-white/90 text-xs font-semibold">
+              <Wallet size={15} />
+              <span>Saldo Dompet Saya</span>
+            </div>
+            <p className="text-white text-2xl font-black tracking-tight mt-1">
+              {rp(dompetSaldo)}
+            </p>
+          </div>
+          <button
+            onClick={() => navigate('/dompet/topup')}
+            className="bg-[#4DB87F] hover:bg-[#3ea06d] text-[#0A3D28] text-sm font-bold px-4 py-2 rounded-xl active:scale-95 transition-all shadow-xs"
+          >
+            + Isi Saldo
+          </button>
+        </div>
+
       </div>
 
-      <div className="px-4 mt-5 space-y-4">
+      <div className="px-4 -mt-3 space-y-4">
+
+        {/* ════ PRIORITAS UTAMA: KARTU TAGIHAN WARGA ════ */}
+        {tagihanTertunggak ? (
+          <div className="bg-white border-2 border-[#F5A623] rounded-2xl p-4 shadow-md animate-scale-up">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#FEF3DC] text-[#A05C00] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <AlertCircle size={22} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#E84040] bg-[#FDEAEA] px-2.5 py-0.5 rounded-full">
+                    {tagihanTertunggak.telat ? '⚠️ Terlambat' : 'Perlu Dibayar'}
+                  </span>
+                  <span className="text-xs text-[#5F7A6E]">
+                    Jatuh tempo: {tagihanTertunggak.jatuhTempo}
+                  </span>
+                </div>
+                <h3 className="text-base font-extrabold text-[#111F1A] mt-1 truncate">
+                  {tagihanTertunggak.judul}
+                </h3>
+                <p className="text-xl font-black text-[#1A6B4A] mt-0.5">
+                  {rp(tagihanTertunggak.nominal)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-3 pt-3 border-t border-[#E2EBE7] flex items-center gap-2">
+              <Button
+                variant="primary"
+                size="md"
+                full
+                onClick={() => navigate('/kas')}
+                className="shadow-sm"
+              >
+                Bayar Sekarang ({rp(tagihanTertunggak.nominal)})
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white border border-[#4DB87F]/40 rounded-2xl p-4 shadow-xs flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#E6F4EE] text-[#1A6B4A] flex items-center justify-center flex-shrink-0">
+              <CheckCircle2 size={22} />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-[#1A6B4A]">Semua Iuran Wajib Lunas</h3>
+              <p className="text-xs text-[#5F7A6E] mt-0.5">Terima kasih atas kedisiplinan gotong royong Anda.</p>
+            </div>
+          </div>
+        )}
+
+        {/* ════ KARTU KAS RT (MILIK BERSAMA) ════ */}
+        <Card className="p-4 bg-white border border-[#D5E2DC]">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-[#E6F4EE] text-[#1A6B4A] flex items-center justify-center">
+                <Users size={16} />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#2D4539]">
+                  Uang Kas RT 05 (Milik Bersama)
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/kas')}
+              className="text-xs font-bold text-[#1A6B4A] hover:underline flex items-center gap-0.5"
+            >
+              <span>Buku Kas</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+
+          <p className="text-2xl font-black text-[#111F1A] tracking-tight mt-1 mb-1">
+            {rp(kasSaldo)}
+          </p>
+          <p className="text-xs text-[#5F7A6E]">
+            Dana warga tersimpan aman &amp; diawasi bersama secara transparan
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#E2EBE7]">
+            <div className="bg-[#F4F7F5] rounded-xl p-2.5">
+              <p className="text-xs font-medium text-[#5F7A6E]">Pemasukan Bulan Ini</p>
+              <p className="text-sm font-bold text-[#1A6B4A] mt-0.5">↑ {shortRp(kasBulanIniMasuk)}</p>
+            </div>
+            <div className="bg-[#F4F7F5] rounded-xl p-2.5">
+              <p className="text-xs font-medium text-[#5F7A6E]">Pengeluaran Bulan Ini</p>
+              <p className="text-sm font-bold text-[#E84040] mt-0.5">↓ {shortRp(kasBulanIniKeluar)}</p>
+            </div>
+          </div>
+        </Card>
 
         {/* ── BANNER KHUSUS PENGURUS ── */}
         {isPengurus && (
           <div
             onClick={() => navigate('/pengurus')}
-            className="bg-gradient-to-r from-[#0D4A33] to-[#1A6B4A] rounded-2xl p-4 text-white flex items-center justify-between cursor-pointer active:scale-98 transition-all shadow-md"
+            className="bg-[#1A6B4A] rounded-2xl p-4 text-white flex items-center justify-between cursor-pointer active:scale-98 transition-all shadow-sm"
           >
             <div className="flex items-center gap-3">
-              <span className="text-2xl">👑</span>
+              <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                <ShieldAlert size={20} />
+              </div>
               <div>
-                <p className="text-xs font-bold text-[#F5A623]">AKSES PENGURUS</p>
-                <p className="text-sm font-bold">Buka Panel Pengurus</p>
+                <span className="text-xs font-bold text-[#F5A623]">AKSES PENGURUS</span>
+                <p className="text-sm font-bold leading-tight">Buka Pusat Kendali Pengurus</p>
               </div>
             </div>
-            <span className="text-white/80 font-bold text-sm">Masuk →</span>
+            <span className="text-white font-bold text-sm bg-white/20 px-3 py-1.5 rounded-xl">
+              Buka →
+            </span>
           </div>
         )}
 
-        {/* ── PINTASAN ── */}
+        {/* ── PINTASAN LAYANAN UTAMA (4 IKON BESAR & MUDAH DITAP) ── */}
         <div>
-          <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2.5 px-1">Pintasan Layanan</p>
-          <div className="grid grid-cols-4 gap-3">
-            {pintasan.map((p) => (
-              <button
-                key={p.label}
-                onClick={() => navigate(p.to)}
-                className="flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
-              >
-                <div className={`w-14 h-14 ${p.bg} rounded-2xl flex items-center justify-center text-2xl shadow-sm`}>
-                  {p.icon}
-                </div>
-                <span className="text-[11px] font-semibold text-[#4A6358] text-center leading-tight">{p.label}</span>
-              </button>
-            ))}
+          <h3 className="text-sm font-bold text-[#111F1A] mb-2.5 px-1">
+            Pintasan Layanan Warga
+          </h3>
+          <div className="grid grid-cols-4 gap-2.5">
+            {pintasan.map((p) => {
+              const Icon = p.icon
+              return (
+                <button
+                  key={p.label}
+                  onClick={() => navigate(p.to)}
+                  className="bg-white border border-[#E2EBE7] rounded-2xl p-3 flex flex-col items-center gap-2 active:scale-95 transition-all shadow-xs hover:border-[#1A6B4A]"
+                >
+                  <div className={`w-14 h-14 ${p.bg} ${p.color} rounded-2xl flex items-center justify-center shadow-xs`}>
+                    <Icon size={26} strokeWidth={2.2} />
+                  </div>
+                  <span className="text-xs font-bold text-[#2D4539] text-center leading-tight">
+                    {p.label}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         </div>
 
-        {/* ── FITUR AI ASSISTANT CARD (HIGHLIGHT DOSEN) ── */}
+        {/* ── KARTU patuAI ASISTEN ── */}
         <div
           onClick={() => navigate('/ai-asisten')}
-          className="bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] rounded-2xl p-3.5 text-white flex items-center gap-3 cursor-pointer active:scale-98 transition-all shadow-md border border-white/20"
+          className="bg-white border-2 border-[#1A6B4A]/25 rounded-2xl p-4 flex items-center gap-3.5 cursor-pointer active:scale-98 transition-all shadow-xs hover:border-[#1A6B4A]"
         >
-          <div className="w-11 h-11 rounded-2xl bg-white/15 flex items-center justify-center p-1.5 flex-shrink-0 shadow-inner border border-white/20">
-            <NailongAvatar className="w-8 h-8" animated />
+          <div className="w-12 h-12 rounded-2xl bg-[#E6F4EE] border border-[#1A6B4A]/20 flex items-center justify-center p-1.5 flex-shrink-0">
+            <NailongAvatar className="w-9 h-9" animated />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 mb-0.5">
-              <span className="font-bold text-sm text-white tracking-tight">PatunganAI Asisten</span>
-              <span className="text-[9px] bg-[#F5A623] text-[#111F1A] font-extrabold px-2 py-0.5 rounded-full whitespace-nowrap leading-none shadow-sm">
-                AI
+              <span className="font-bold text-sm text-[#111F1A]">patuAI Asisten</span>
+              <span className="text-xs bg-[#E6F4EE] text-[#1A6B4A] font-bold px-2 py-0.5 rounded-full">
+                AI Pintar
               </span>
             </div>
-            <p className="text-[11px] text-white/80 leading-tight truncate">
-              Cek tagihan, simulasi cicilan & ringkas kas
+            <p className="text-xs text-[#5F7A6E] leading-relaxed truncate">
+              Tanya tagihan, simulasi pinjaman, atau kas RT
             </p>
           </div>
-          <div className="flex-shrink-0 bg-white/15 hover:bg-white/25 border border-white/20 rounded-full px-3 py-1.5 text-xs font-bold flex items-center gap-1 text-white shadow-sm active:scale-95 transition-all">
+          <div className="flex-shrink-0 bg-[#1A6B4A] text-white rounded-xl px-3.5 py-2 text-xs font-bold flex items-center gap-1 shadow-xs">
             <span>Tanya</span>
-            <span className="text-xs">›</span>
+            <ChevronRight size={14} />
           </div>
         </div>
 
-        {/* ── ALERT TAGIHAN JATUH TEMPO ── */}
-        {tagihanTertunggak && (
-          <div className="bg-[#FEF3DC] border border-[#F5A623]/30 border-l-4 border-l-[#F5A623] rounded-2xl p-4 flex items-center gap-3">
-            <span className="text-2xl flex-shrink-0">⏰</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#7A5000]">{tagihanTertunggak.judul}</p>
-              <p className="text-xs text-[#9A6A10] mt-0.5">
-                Jatuh tempo: {tagihanTertunggak.jatuhTempo} ({rp(tagihanTertunggak.nominal)})
-              </p>
-            </div>
-            <Button
-              variant="accent"
-              size="sm"
-              onClick={() => navigate('/kas')}
-            >
-              Bayar
-            </Button>
-          </div>
-        )}
-
         {/* ── PENGUMUMAN RAPAT / AGENDA ── */}
         <div>
-          <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2.5 px-1">Pengumuman Terkini</p>
-          <Card className="p-4 flex gap-3 items-start">
-            <span className="text-2xl flex-shrink-0">📢</span>
+          <h3 className="text-sm font-bold text-[#111F1A] mb-2 px-1">
+            Pengumuman &amp; Agenda Terkini
+          </h3>
+          <Card className="p-4 flex gap-3.5 items-start">
+            <div className="w-10 h-10 rounded-xl bg-[#FEF3DC] text-[#A05C00] flex items-center justify-center flex-shrink-0">
+              <Calendar size={20} />
+            </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-[#111F1A]">Rapat Koordinasi – 20 Nov 2026</p>
-              <p className="text-xs text-[#8FA89E] mt-0.5">Pukul 19:00 WIB · Balai RW 05 Tarunesha</p>
-              <p className="text-[11px] text-[#4A6358] mt-1.5 leading-relaxed">
-                Agenda: Evaluasi laporan kas triwulan dan persiapan kegiatan bakti sosial akhir tahun.
+              <p className="text-sm font-bold text-[#111F1A]">Rapat Koordinasi &amp; Arisan Bulanan</p>
+              <p className="text-xs text-[#5F7A6E] mt-0.5">Jumat, 20 Nov 2026 · 19:30 WIB (Balai RW 05)</p>
+              <p className="text-xs text-[#456355] mt-2 leading-relaxed">
+                Agenda: Pembahasan transparansi kas akhir tahun dan pengocokan nomor arisan periode November.
               </p>
             </div>
           </Card>
@@ -209,29 +296,31 @@ export default function Beranda() {
 
         {/* ── AKTIVITAS TERBARU ── */}
         <div>
-          <div className="flex items-center justify-between mb-2.5 px-1">
-            <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest">Aktivitas Terakhir</p>
+          <div className="flex items-center justify-between mb-2 px-1">
+            <h3 className="text-sm font-bold text-[#111F1A]">Aktivitas Terakhir</h3>
             <button
               onClick={() => navigate('/kas')}
-              className="text-xs font-semibold text-[#1A6B4A] active:scale-95"
+              className="text-xs font-bold text-[#1A6B4A] hover:underline"
             >
-              Lihat Kas Resmi
+              Lihat Kas Resmi →
             </button>
           </div>
           <Card>
             {transaksi.slice(0, 4).map((a, i) => (
               <div
                 key={a.id || i}
-                className={`flex items-center gap-3 p-4 ${i < Math.min(transaksi.length, 4) - 1 ? 'border-b border-[#F4F7F5]' : ''}`}
+                className={`flex items-center gap-3 p-3.5 ${i < Math.min(transaksi.length, 4) - 1 ? 'border-b border-[#F4F7F5]' : ''}`}
               >
-                <div className={`w-10 h-10 ${a.bg} rounded-xl flex items-center justify-center text-lg flex-shrink-0`}>
-                  {a.icon}
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                  a.amount > 0 ? 'bg-[#E6F4EE] text-[#1A6B4A]' : 'bg-[#FDEAEA] text-[#E84040]'
+                }`}>
+                  {a.amount > 0 ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#111F1A] truncate">{a.judul}</p>
-                  <p className="text-xs text-[#8FA89E] mt-0.5">{a.sub}</p>
+                  <p className="text-sm font-bold text-[#111F1A] truncate">{a.judul}</p>
+                  <p className="text-xs text-[#5F7A6E] mt-0.5">{a.sub}</p>
                 </div>
-                <p className={`text-sm font-bold flex-shrink-0 ${a.amount > 0 ? 'text-[#1A6B4A]' : 'text-[#E84040]'}`}>
+                <p className={`text-base font-black flex-shrink-0 ${a.amount > 0 ? 'text-[#1A6B4A]' : 'text-[#E84040]'}`}>
                   {a.amount > 0 ? '+' : ''}{shortRp(Math.abs(a.amount))}
                 </p>
               </div>

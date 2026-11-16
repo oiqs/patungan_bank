@@ -1,14 +1,18 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
 import { rp, shortRp } from '../../lib/format'
 import { useBankStore } from '../../store/useBankStore'
+import { ArrowLeft, Calendar, Heart, CheckCircle2, Users } from 'lucide-react'
 
-const nominalCepat = [5000, 10000, 20000, 50000]
+const nominalCepat = [10000, 20000, 50000, 100000]
 
 export default function Kegiatan() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const initialTab = searchParams.get('tab') === 'sosial' ? 'sosial' : 'kegiatan'
+
   const {
     kegiatanList,
     sosialList,
@@ -17,7 +21,7 @@ export default function Kegiatan() {
     donasiSosial
   } = useBankStore()
 
-  const [tab, setTab] = useState('kegiatan')
+  const [tab, setTab] = useState(initialTab)
   const [modalPatungan, setModalPatungan] = useState(null)
   const [nominalInput, setNominalInput] = useState(20000)
   const [pesanNotif, setPesanNotif] = useState('')
@@ -26,7 +30,7 @@ export default function Kegiatan() {
     if (nominalInput <= 0) return
     const success = ikutPatunganKegiatan(modalPatungan.id, nominalInput, 'dompet')
     if (success) {
-      setPesanNotif(`Terima kasih! Patungan Rp ${nominalInput.toLocaleString('id-ID')} berhasil dipotong dari dompet.`)
+      setPesanNotif(`Terima kasih! Patungan ${rp(nominalInput)} berhasil dipotong dari dompet.`)
       setTimeout(() => {
         setModalPatungan(null)
         setPesanNotif('')
@@ -39,7 +43,7 @@ export default function Kegiatan() {
   const handleKirimDonasi = (sosialId) => {
     const success = donasiSosial(sosialId, nominalInput, 'dompet')
     if (success) {
-      setPesanNotif(`Alhamdulillah! Donasi Rp ${nominalInput.toLocaleString('id-ID')} berhasil disalurkan.`)
+      setPesanNotif(`Alhamdulillah! Donasi ${rp(nominalInput)} berhasil disalurkan.`)
       setTimeout(() => {
         setModalPatungan(null)
         setPesanNotif('')
@@ -50,220 +54,212 @@ export default function Kegiatan() {
   }
 
   return (
-    <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12 pb-24">
+    <div className="w-full h-full flex flex-col bg-[#F4F7F5] overflow-y-auto no-scrollbar pb-24">
       {/* Header */}
-      <div className="bg-white px-5 py-4 border-b border-[#E2EBE7] flex items-center gap-3 sticky top-0 z-10">
-        <button onClick={() => navigate(-1)} className="text-[#1A6B4A] font-bold active:scale-95 transition-transform">←</button>
-        <h1 className="text-[#111F1A] font-bold text-base flex-1">Kegiatan & Dana Sosial</h1>
+      <div className="bg-white px-4 py-3.5 border-b border-[#E2EBE7] flex items-center gap-2 sticky top-0 z-10 pt-12">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-[#1A6B4A] hover:bg-[#E6F4EE] active:scale-95 transition-all"
+          aria-label="Kembali"
+        >
+          <ArrowLeft size={22} />
+        </button>
+        <h1 className="text-[#111F1A] font-bold text-base flex-1">
+          {tab === 'kegiatan' ? 'Kegiatan & Gotong Royong' : 'Dana Sosial & Santunan'}
+        </h1>
       </div>
 
       {/* Tab Switcher */}
-      <div className="bg-white px-5 flex gap-2 border-b border-[#E2EBE7]">
+      <div className="bg-white px-4 flex gap-2 border-b border-[#E2EBE7]">
         {[
-          { key: 'kegiatan', label: '🎉 Kegiatan Warga' },
-          { key: 'sosial', label: '❤️ Dana Sosial' },
-        ].map(t => (
-          <button
-            key={t.key}
-            onClick={() => setTab(t.key)}
-            className={`py-3 text-xs font-bold border-b-2 transition-all active:scale-95 flex-1 text-center ${
-              tab === t.key
-                ? 'border-[#1A6B4A] text-[#1A6B4A]'
-                : 'border-transparent text-[#8FA89E]'
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+          { key: 'kegiatan', label: 'Kegiatan Warga', icon: Calendar },
+          { key: 'sosial', label: 'Dana Sosial & Duka', icon: Heart },
+        ].map(t => {
+          const Icon = t.icon
+          const isActive = tab === t.key
+          return (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`py-3 text-sm font-bold border-b-2 transition-all flex-1 text-center flex items-center justify-center gap-1.5 ${
+                isActive
+                  ? 'border-[#1A6B4A] text-[#1A6B4A]'
+                  : 'border-transparent text-[#5F7A6E] hover:text-[#111F1A]'
+              }`}
+            >
+              <Icon size={16} />
+              <span>{t.label}</span>
+            </button>
+          )
+        })}
       </div>
 
-      <div className="flex-1 px-4 py-4 flex flex-col gap-4">
+      <div className="px-4 py-4 space-y-4">
         {/* TAB KEGIATAN */}
         {tab === 'kegiatan' && (
-          <>
-            <div className="bg-[#E6F4EE] rounded-2xl p-4 text-xs text-[#1A6B4A] leading-relaxed">
+          <div className="space-y-3.5">
+            <div className="bg-[#E6F4EE] border border-[#1A6B4A]/20 rounded-2xl p-4 text-sm text-[#1A6B4A] leading-relaxed">
               <strong>Transparansi Anggaran Kegiatan:</strong> Seluruh dana patungan kegiatan tercatat real-time lengkap dengan Rencana Anggaran Biaya (RAB) dan realisasi pengeluaran fisik.
             </div>
 
             {kegiatanList.map((k) => {
               const pct = Math.min(100, Math.round((k.terkumpul / k.target) * 100))
               return (
-                <Card key={k.id} className="p-4 flex flex-col gap-3">
+                <Card key={k.id} className="p-4 space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-[#E6F4EE] flex items-center justify-center text-2xl flex-shrink-0">
-                      {k.emoji}
+                    <div className="w-12 h-12 rounded-2xl bg-[#E6F4EE] flex items-center justify-center text-2xl flex-shrink-0">
+                      {k.emoji || '🎉'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#111F1A] text-sm">{k.nama}</p>
-                      <p className="text-xs text-[#8FA89E] mt-0.5">Panitia: {k.panitia}</p>
-                      <p className="text-[11px] text-[#4A6358] mt-0.5">RAB Target: <strong>{rp(k.target)}</strong></p>
+                      <p className="font-bold text-[#111F1A] text-base">{k.nama}</p>
+                      <p className="text-xs text-[#5F7A6E] mt-0.5">Panitia: {k.panitia}</p>
+                      <p className="text-sm text-[#2D4539] mt-0.5">RAB Target: <strong>{rp(k.target)}</strong></p>
                     </div>
-                    <span className="text-xs font-extrabold text-[#1A6B4A] bg-[#E6F4EE] px-2.5 py-1 rounded-full">
+                    <span className="text-xs font-black text-[#1A6B4A] bg-[#E6F4EE] px-2.5 py-1 rounded-full">
                       {pct}%
                     </span>
                   </div>
 
                   {/* Progress */}
                   <div>
-                    <div className="flex justify-between text-xs text-[#4A6358] mb-1.5 font-medium">
-                      <span>Terkumpul: <strong>{rp(k.terkumpul)}</strong></span>
+                    <div className="flex justify-between text-xs text-[#5F7A6E] mb-1.5 font-medium">
+                      <span>Terkumpul: <strong className="text-[#1A6B4A]">{rp(k.terkumpul)}</strong></span>
                       <span>Sisa: {shortRp(Math.max(0, k.target - k.terkumpul))}</span>
                     </div>
-                    <div className="w-full h-2.5 bg-[#E2EBE7] rounded-full overflow-hidden">
+                    <div className="w-full h-3 bg-[#E2EBE7] rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-[#1A6B4A] to-[#4DB87F] rounded-full transition-all duration-500"
+                        className="h-full bg-[#1A6B4A] rounded-full transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
                   </div>
 
-                  <div className="flex gap-2 pt-1">
+                  <div className="pt-1">
                     <Button
                       full
-                      size="sm"
+                      size="md"
                       variant="primary"
                       onClick={() => {
-                        setModalPatungan({ ...k, type: 'kegiatan' })
                         setNominalInput(20000)
+                        setModalPatungan({ ...k, type: 'kegiatan' })
                       }}
                     >
-                      🤝 Ikut Patungan
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => navigate('/kas')}
-                    >
-                      Nota RAB
+                      Ikut Patungan ({shortRp(20000)})
                     </Button>
                   </div>
                 </Card>
               )
             })}
-          </>
+          </div>
         )}
 
-        {/* TAB DANA SOSIAL */}
+        {/* TAB SOSIAL */}
         {tab === 'sosial' && (
-          <>
-            <div className="bg-[#FAEAEA] rounded-2xl p-4 text-xs text-[#E84040] leading-relaxed">
-              <strong>Solidaritas & Penjengukan Warga:</strong> Bantuan santunan cepat untuk warga Tarunesha yang sakit, melahirkan, atau mengalami duka cita keluarga.
+          <div className="space-y-3.5">
+            <div className="bg-[#FAEAEA] border border-[#E84040]/20 rounded-2xl p-4 text-sm text-[#C93535] leading-relaxed">
+              <strong>Dana Santunan Sosial:</strong> Disalurkan langsung kepada keluarga warga yang mengalami musibah sakit, kecelakaan, atau duka cita.
             </div>
 
-            {sosialList.map((d) => {
-              const pct = Math.min(100, Math.round((d.terkumpul / d.target) * 100))
-              return (
-                <Card key={d.id} className="p-4 flex flex-col gap-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-11 h-11 rounded-2xl bg-red-50 flex items-center justify-center text-2xl flex-shrink-0">
-                      {d.emoji}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-bold text-[#111F1A] text-sm">{d.nama}</p>
-                      <p className="text-xs text-[#8FA89E] mt-0.5">Penerima: {d.penerima}</p>
-                      <p className="text-[11px] text-[#E84040] mt-1 bg-red-50 p-1.5 rounded-lg">
-                        <strong>Keterangan:</strong> {d.alasan}
-                      </p>
-                    </div>
+            {sosialList.map((d) => (
+              <Card key={d.id} className="p-4 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FAEAEA] flex items-center justify-center text-2xl flex-shrink-0">
+                    {d.emoji || '❤️'}
                   </div>
-
-                  <div>
-                    <div className="flex justify-between text-xs text-[#4A6358] mb-1.5">
-                      <span>Terkumpul: <strong>{rp(d.terkumpul)}</strong></span>
-                      <span>Target: {rp(d.target)} ({pct}%)</span>
-                    </div>
-                    <div className="w-full h-2.5 bg-[#E2EBE7] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#E84040] rounded-full transition-all"
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-bold text-[#E84040] bg-[#FDEAEA] px-2 py-0.5 rounded-full inline-block mb-1">
+                      {d.kategori}
+                    </span>
+                    <p className="font-bold text-[#111F1A] text-base">{d.nama}</p>
+                    <p className="text-sm text-[#5F7A6E] mt-0.5">{d.deskripsi}</p>
                   </div>
+                </div>
 
-                  <Button
-                    full
-                    size="sm"
-                    variant="danger"
-                    onClick={() => {
-                      setModalPatungan({ ...d, type: 'sosial' })
-                      setNominalInput(10000)
-                    }}
-                  >
-                    ❤️ Kirim Donasi Santunan
-                  </Button>
-                </Card>
-              )
-            })}
-          </>
+                <div className="bg-[#F4F7F5] rounded-xl p-3 flex justify-between items-center text-sm">
+                  <span className="text-[#5F7A6E]">Terkumpul Saat Ini:</span>
+                  <span className="font-black text-[#1A6B4A]">{rp(d.terkumpul)}</span>
+                </div>
+
+                <Button
+                  full
+                  size="md"
+                  variant="danger"
+                  onClick={() => {
+                    setNominalInput(20000)
+                    setModalPatungan({ ...d, type: 'sosial' })
+                  }}
+                >
+                  Kirim Santunan Donasi
+                </Button>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* MODAL NOMINAL PATUNGAN / DONASI */}
+      {/* MODAL INPUT PATUNGAN / DONASI */}
       {modalPatungan && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4 animate-scale-up">
+        <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-3xl p-5 w-full max-w-sm flex flex-col gap-4 animate-scale-up">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm text-[#111F1A]">
-                {modalPatungan.type === 'kegiatan' ? 'Ikut Patungan' : 'Donasi Santunan'}
+              <h3 className="font-bold text-base text-[#111F1A]">
+                {modalPatungan.type === 'kegiatan' ? 'Ikut Patungan Kegiatan' : 'Kirim Donasi Santunan'}
               </h3>
-              <button onClick={() => setModalPatungan(null)} className="text-[#8FA89E] text-lg font-bold">✕</button>
+              <button onClick={() => setModalPatungan(null)} className="w-9 h-9 rounded-full flex items-center justify-center text-[#5F7A6E] font-bold">✕</button>
             </div>
 
-            <p className="text-xs text-[#4A6358] font-semibold">{modalPatungan.nama}</p>
+            <div className="bg-[#F4F7F5] rounded-2xl p-3 border border-[#E2EBE7]">
+              <p className="text-xs text-[#5F7A6E]">Program</p>
+              <p className="text-sm font-bold text-[#111F1A] mt-0.5">{modalPatungan.nama}</p>
+            </div>
 
             {pesanNotif && (
-              <div className={`p-3 rounded-xl text-xs font-bold text-center ${
-                pesanNotif.includes('berhasil') || pesanNotif.includes('Terima') ? 'bg-green-50 text-[#1A6B4A]' : 'bg-red-50 text-[#E84040]'
-              }`}>
+              <div className="bg-[#E6F4EE] border border-[#1A6B4A] text-[#1A6B4A] text-sm font-bold p-3 rounded-xl text-center">
                 {pesanNotif}
               </div>
             )}
 
             <div>
-              <p className="text-xs text-[#8FA89E] mb-2">Pilih nominal donasi:</p>
-              <div className="grid grid-cols-2 gap-2 mb-2">
-                {nominalCepat.map(n => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => setNominalInput(n)}
-                    className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all ${
-                      nominalInput === n
-                        ? 'bg-[#1A6B4A] text-white border-[#1A6B4A]'
-                        : 'bg-white text-[#4A6358] border-[#E2EBE7]'
-                    }`}
-                  >
-                    {shortRp(n)}
-                  </button>
-                ))}
-              </div>
-
+              <label className="text-sm font-bold text-[#2D4539] block mb-1.5">
+                Nominal Patungan (Rp)
+              </label>
               <input
                 type="number"
-                placeholder="Nominal lainnya (Rp)"
                 value={nominalInput}
-                onChange={e => setNominalInput(Number(e.target.value))}
-                className="w-full border border-[#E2EBE7] rounded-xl px-4 py-2.5 text-xs bg-[#F4F7F5] focus:outline-none focus:border-[#1A6B4A] font-bold"
+                onChange={e => setNominalInput(Math.max(0, +e.target.value))}
+                className="w-full border border-[#D5E2DC] rounded-xl px-4 py-3 text-lg font-bold bg-[#F4F7F5] focus:outline-none focus:border-[#1A6B4A] text-[#111F1A]"
               />
             </div>
 
-            <p className="text-[10px] text-[#8FA89E]">
-              Akan dipotong dari Saldo Dompet Anda: <strong>{rp(dompetSaldo)}</strong>
-            </p>
+            {/* Quick chips */}
+            <div className="grid grid-cols-4 gap-2">
+              {nominalCepat.map((n) => (
+                <button
+                  key={n}
+                  onClick={() => setNominalInput(n)}
+                  className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                    nominalInput === n
+                      ? 'bg-[#1A6B4A] text-white border-[#1A6B4A]'
+                      : 'bg-white border-[#D5E2DC] text-[#2D4539]'
+                  }`}
+                >
+                  {shortRp(n)}
+                </button>
+              ))}
+            </div>
 
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                full
+            <div className="pt-2 flex gap-2">
+              <button
+                type="button"
                 onClick={() => setModalPatungan(null)}
+                className="flex-1 py-3 border border-[#D5E2DC] rounded-xl text-sm font-bold text-[#5F7A6E] active:scale-95"
               >
                 Batal
-              </Button>
+              </button>
               <Button
                 variant={modalPatungan.type === 'kegiatan' ? 'primary' : 'danger'}
-                size="sm"
-                full
+                size="md"
+                className="flex-1"
                 onClick={() => {
                   if (modalPatungan.type === 'kegiatan') {
                     handleKirimPatungan()
@@ -272,7 +268,7 @@ export default function Kegiatan() {
                   }
                 }}
               >
-                Konfirmasi Bayar
+                Kirim ({shortRp(nominalInput)})
               </Button>
             </div>
           </div>

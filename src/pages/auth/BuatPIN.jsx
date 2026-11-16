@@ -1,90 +1,118 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../../components/Button'
+import { useBankStore } from '../../store/useBankStore'
+import { Lock, Delete, CheckCircle2, Fingerprint } from 'lucide-react'
+
+const NUMPAD = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫']
 
 export default function BuatPIN() {
   const navigate = useNavigate()
-  const [pin, setPin] = useState(['', '', '', '', '', ''])
-  const [fingerprint, setFingerprint] = useState(false)
+  const { setPin: savePinToStore, toggleFingerprint } = useBankStore()
+  const [pin, setPin] = useState([])
+  const [fingerprint, setFingerprint] = useState(true)
 
-  const handleChange = (val, idx) => {
-    if (!/^\d*$/.test(val)) return
-    const next = [...pin]
-    next[idx] = val.slice(-1)
-    setPin(next)
-    if (val && idx < 5) {
-      document.getElementById(`pin-${idx + 1}`)?.focus()
+  const handlePress = (key) => {
+    if (!key) return
+    if (key === '⌫') {
+      setPin(prev => prev.slice(0, -1))
+      return
+    }
+    if (pin.length < 6) {
+      setPin(prev => [...prev, key])
     }
   }
 
-  const handleKeyDown = (e, idx) => {
-    if (e.key === 'Backspace' && !pin[idx] && idx > 0) {
-      document.getElementById(`pin-${idx - 1}`)?.focus()
-    }
-  }
+  const isFull = pin.length === 6
 
-  const isFull = pin.every(d => d !== '')
+  const handleSimpanPin = () => {
+    if (!isFull) return
+    savePinToStore(pin.join(''))
+    if (fingerprint) {
+      toggleFingerprint()
+    }
+    navigate('/')
+  }
 
   return (
-    <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12">
-      <div className="flex-1 flex flex-col items-center px-6 py-10 gap-6">
-        {/* Lock icon with bounce animation */}
-        <div
-          className="text-7xl"
-          style={{ animation: 'bounce 1.5s infinite' }}
-        >
-          🔒
+    <div className="w-full h-full flex flex-col justify-between bg-[#F4F7F5] select-none pb-8 pt-12">
+      <div className="px-5 flex flex-col items-center">
+        
+        {/* Lock Icon */}
+        <div className="w-16 h-16 rounded-3xl bg-[#E6F4EE] text-[#1A6B4A] flex items-center justify-center mb-3 mt-4 shadow-xs">
+          <Lock size={32} />
         </div>
 
-        <div className="text-center">
-          <h1 className="text-[#111F1A] text-2xl font-bold mb-1">Buat PIN Rahasia</h1>
-          <p className="text-[#4A6358] text-sm">PIN 6 digit digunakan untuk verifikasi transaksi</p>
-        </div>
+        <h1 className="text-xl font-extrabold text-[#111F1A] text-center">
+          Buat PIN Rahasia Anda
+        </h1>
+        <p className="text-sm text-[#5F7A6E] text-center mt-1">
+          Gunakan 6 digit angka untuk verifikasi transaksi &amp; keamanan
+        </p>
 
-        {/* PIN Grid */}
-        <div className="grid grid-cols-6 gap-2 w-full max-w-xs">
-          {pin.map((digit, i) => (
-            <input
+        {/* PIN 6 Dots Indicator */}
+        <div className="flex gap-4 my-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
               key={i}
-              id={`pin-${i}`}
-              type="password"
-              maxLength={1}
-              value={digit}
-              onChange={e => handleChange(e.target.value, i)}
-              onKeyDown={e => handleKeyDown(e, i)}
-              className="w-full aspect-square text-center text-2xl font-bold border-2 rounded-xl bg-white focus:outline-none focus:border-[#1A6B4A] transition-colors"
-              style={{ borderColor: digit ? '#1A6B4A' : '#E2EBE7' }}
+              className={`w-4 h-4 rounded-full transition-all duration-150 ${
+                i < pin.length
+                  ? 'bg-[#1A6B4A] scale-125 shadow-[0_0_8px_rgba(26,107,74,0.4)]'
+                  : 'bg-[#C8D9D2]'
+              }`}
             />
           ))}
         </div>
 
-        {/* Fingerprint Toggle */}
-        <div className="flex items-center justify-between w-full max-w-xs bg-white border border-[#E2EBE7] rounded-2xl px-4 py-4">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">👆</span>
+        {/* Numpad Besar Sesuai Halaman Login */}
+        <div className="grid grid-cols-3 gap-3 w-full max-w-[290px] mb-4">
+          {NUMPAD.map((key, idx) => (
+            <button
+              key={idx}
+              onClick={() => handlePress(key)}
+              disabled={!key}
+              className={`h-14 rounded-2xl text-xl font-black flex items-center justify-center transition-all ${
+                !key
+                  ? 'invisible'
+                  : key === '⌫'
+                  ? 'bg-white text-[#1A6B4A] border border-[#D5E2DC] shadow-xs active:scale-90 hover:bg-gray-50'
+                  : 'bg-white text-[#111F1A] border border-[#D5E2DC] shadow-xs active:scale-90 hover:border-[#1A6B4A]'
+              }`}
+            >
+              {key === '⌫' ? <Delete size={22} /> : key}
+            </button>
+          ))}
+        </div>
+
+        {/* Toggle Fingerprint */}
+        <div className="flex items-center justify-between w-full max-w-[290px] bg-white border border-[#E2EBE7] rounded-2xl px-4 py-3 shadow-xs">
+          <div className="flex items-center gap-2.5">
+            <Fingerprint size={22} className="text-[#1A6B4A]" />
             <div>
-              <p className="text-sm font-semibold text-[#111F1A]">Aktifkan Sidik Jari</p>
-              <p className="text-xs text-[#8FA89E]">Login lebih cepat & aman</p>
+              <p className="text-xs font-bold text-[#111F1A]">Aktifkan Sidik Jari</p>
+              <p className="text-[11px] text-[#5F7A6E]">Login instan tanpa ketik PIN</p>
             </div>
           </div>
           <button
             onClick={() => setFingerprint(f => !f)}
-            className={`w-12 h-6 rounded-full transition-colors active:scale-95 ${fingerprint ? 'bg-[#1A6B4A]' : 'bg-[#E2EBE7]'}`}
+            className={`w-11 h-6 rounded-full transition-colors ${fingerprint ? 'bg-[#1A6B4A]' : 'bg-[#E2EBE7]'}`}
           >
-            <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${fingerprint ? 'translate-x-6' : 'translate-x-0.5'}`} />
+            <div className={`w-5 h-5 bg-white rounded-full shadow-xs transition-transform ${fingerprint ? 'translate-x-5' : 'translate-x-0.5'}`} />
           </button>
         </div>
 
-        <div className="w-full max-w-xs mt-2">
-          <Button
-            full
-            size="lg"
-            disabled={!isFull}
-            onClick={() => navigate('/')}
-          >
-            Simpan &amp; Masuk
-          </Button>
-        </div>
+      </div>
+
+      {/* Button Simpan */}
+      <div className="px-6 w-full max-w-[320px] mx-auto">
+        <Button
+          full
+          size="lg"
+          disabled={!isFull}
+          onClick={handleSimpanPin}
+        >
+          Simpan PIN &amp; Masuk
+        </Button>
       </div>
     </div>
   )

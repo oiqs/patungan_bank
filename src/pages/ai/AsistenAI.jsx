@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { rp, shortRp } from '../../lib/format'
-import Card from '../../components/Card'
+import { rp } from '../../lib/format'
 import Button from '../../components/Button'
 import NailongAvatar from '../../components/NailongAvatar'
 import { useBankStore } from '../../store/useBankStore'
+import { ArrowLeft, Send, Mic, Sparkles } from 'lucide-react'
 
 export default function AsistenAI() {
   const navigate = useNavigate()
@@ -25,7 +25,7 @@ export default function AsistenAI() {
     {
       id: 'm1',
       sender: 'ai',
-      text: `Halo ${currentUser.nama}! 👋 Aku PatunganAI, asisten pintar Patungan Bank Tarunesha. Aku siap membantu Anda mengecek tagihan iuran, menghitung simulasi pinjaman, memantau transparansi kas RT, atau jadwal arisan!`,
+      text: `Halo Pak/Bu ${currentUser.nama}! 👋 Aku patuAI, asisten keuangan digital warga Tarunesha. Aku siap membantu mengecek tagihan iuran, simulasi pinjaman modal, kas RT, atau jadwal undian arisan.`,
       time: '12:00',
     }
   ])
@@ -37,10 +37,10 @@ export default function AsistenAI() {
   }, [messages, isTyping])
 
   const quickPrompts = [
-    { label: '💳 Status Iuran Saya', query: 'Apakah iuran wajib saya sudah lunas?' },
-    { label: '📊 Kas RT Tarunesha', query: 'Berapa saldo kas Tarunesha saat ini?' },
-    { label: '🌾 Simulasi Pinjaman Tani', query: 'Berapa cicilan pinjaman modal tani Rp 1.500.000?' },
-    { label: '🎲 Kapan Undian Arisan?', query: 'Berapa total pot arisan bulan ini?' },
+    { label: 'Status Iuran Saya', query: 'Apakah iuran wajib saya sudah lunas?' },
+    { label: 'Uang Kas RT', query: 'Berapa saldo kas Tarunesha saat ini?' },
+    { label: 'Simulasi Pinjaman', query: 'Berapa cicilan pinjaman modal tani Rp 1.500.000?' },
+    { label: 'Undian Arisan', query: 'Berapa total pot arisan bulan ini?' },
   ]
 
   const handleSend = (text) => {
@@ -73,7 +73,7 @@ export default function AsistenAI() {
               type: 'bayar_iuran',
               tagihanId: belum.id,
               nominal: belum.nominal,
-              label: 'Bayar Sekarang via Saldo Dompet',
+              label: 'Bayar Sekarang via Dompet',
             },
             time: 'Baru saja',
           }
@@ -81,7 +81,7 @@ export default function AsistenAI() {
           aiReply = {
             id: `ai-${Date.now()}`,
             sender: 'ai',
-            text: `Alhamdulillah! Seluruh tagihan iuran wajib Anda telah **Lunas**. Pertahankan kedisiplinan gotong royong ini ya! ⭐`,
+            text: `Alhamdulillah! Seluruh tagihan iuran wajib Anda telah **Lunas**. Terima kasih atas komitmen gotong royongnya! ⭐`,
             time: 'Baru saja',
           }
         }
@@ -89,11 +89,11 @@ export default function AsistenAI() {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `Ringkasan kas resmi Tarunesha RT 05 per hari ini:\n• **Saldo Kas Bersih:** ${rp(kasSaldo)}\n• **Kas Masuk Bulan Ini:** +${rp(kasBulanIniMasuk)}\n• **Kas Keluar Nota:** -${rp(kasBulanIniKeluar)}\n\nLaporan keuangan lengkap dapat diakses secara transparan oleh seluruh warga.`,
+          text: `Ringkasan Uang Kas RT Tarunesha hari ini:\n• **Saldo Kas Bersih:** ${rp(kasSaldo)}\n• **Pemasukan Bulan Ini:** +${rp(kasBulanIniMasuk)}\n• **Pengeluaran Nota:** -${rp(kasBulanIniKeluar)}\n\nLaporan keuangan lengkap dapat diawasi terbuka oleh seluruh warga.`,
           action: {
             type: 'link',
-            url: '/kas/laporan',
-            label: 'Lihat Laporan Grafik & Unduh PDF',
+            url: '/kas',
+            label: 'Buka Buku Kas & Laporan',
           },
           time: 'Baru saja',
         }
@@ -101,11 +101,11 @@ export default function AsistenAI() {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `Skor reputasi Anda adalah **${currentUser.skor}/100** (Plafon: ${rp(currentUser.plafonTersedia)}).\n\nSimulasi Pinjaman Modal Rp 1.500.000 tenor 6 bulan:\n• Bunga jasa gotong royong: 1.5%/bulan\n• Estimasi cicilan: **Rp 272.500 / bulan**.\nPengajuan mudah tanpa agunan sertifikat, cukup penjamin sesama warga Tarunesha.`,
+          text: `Skor reputasi Anda adalah **${currentUser.skor}/100** (Plafon: ${rp(currentUser.plafonTersedia)}).\n\nSimulasi pinjaman Rp 1.500.000 tenor 6 bulan:\n• Biaya gotong royong: 1.5%/bulan\n• Estimasi cicilan: **Rp 272.500 / bulan**.\nPengajuan mudah tanpa jaminan sertifikat.`,
           action: {
             type: 'link',
             url: '/layanan/ajukan-pinjaman',
-            label: 'Buka Form Pengajuan Pembiayaan',
+            label: 'Buka Formulir Pembiayaan',
           },
           time: 'Baru saja',
         }
@@ -113,7 +113,7 @@ export default function AsistenAI() {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `Informasi **${arisan.judul}**:\n• Periode: ${arisan.periode}\n• Total Pot Terkumpul: **${rp(arisan.pot)}**\n• Pemenang sebelumnya: ${arisan.riwayatPemenang[0]?.nama || 'Dewi Lestari'}\n\nUndian transparan dapat dikocok langsung secara digital!`,
+          text: `Informasi **${arisan.judul}**:\n• Periode: ${arisan.periode}\n• Total Pot Terkumpul: **${rp(arisan.pot)}**\n• Pemenang sebelumnya: ${arisan.riwayatPemenang[0]?.nama || 'Dewi Lestari'}\n\nUndian transparan dikocok bersama pengurus warga!`,
           action: {
             type: 'link',
             url: '/layanan/arisan',
@@ -125,7 +125,7 @@ export default function AsistenAI() {
         aiReply = {
           id: `ai-${Date.now()}`,
           sender: 'ai',
-          text: `Saya mengerti pertanyaan Anda seputar "${query}". Anda dapat membuka menu **Kas** untuk tagihan dan laporan, **Layanan** untuk arisan & pembiayaan, atau **Dompet** untuk saldo Anda.`,
+          text: `Aku mengerti pertanyaan seputar "${query}". Anda dapat membuka menu **Kas RT** untuk iuran dan laporan, **Layanan** untuk arisan & pembiayaan, atau **Dompet** untuk saldo Anda.`,
           time: 'Baru saja',
         }
       }
@@ -165,31 +165,37 @@ export default function AsistenAI() {
   }
 
   return (
-    <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12 pb-24">
+    <div className="w-full h-full flex flex-col bg-[#F4F7F5] overflow-hidden">
       {/* Top Header */}
-      <div className="bg-white px-5 py-3.5 border-b border-[#E2EBE7] flex items-center gap-3 sticky top-0 z-10 shadow-sm">
-        <button onClick={() => navigate(-1)} className="text-[#1A6B4A] font-bold text-lg active:scale-95 transition-transform">←</button>
+      <div className="bg-white px-4 py-3.5 border-b border-[#E2EBE7] flex items-center gap-2 flex-shrink-0 pt-12">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-[#1A6B4A] hover:bg-[#E6F4EE] active:scale-95 transition-all"
+          aria-label="Kembali"
+        >
+          <ArrowLeft size={22} />
+        </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-[#111F1A] font-extrabold text-base">PatunganAI Asisten</h1>
-            <span className="text-[10px] font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2 py-0.5 rounded-full">
+            <h1 className="text-[#111F1A] font-bold text-base leading-tight">patuAI Asisten</h1>
+            <span className="text-xs font-bold bg-[#E6F4EE] text-[#1A6B4A] px-2.5 py-0.5 rounded-full">
               Online
             </span>
           </div>
-          <p className="text-[11px] text-[#8FA89E]">Asisten Cerdas Keuangan & Gotong Royong</p>
+          <p className="text-xs text-[#5F7A6E]">Asisten Keuangan Warga Tarunesha</p>
         </div>
-        <div className="w-9 h-9 rounded-2xl bg-[#FEF3DC] border border-[#F5A623]/30 flex items-center justify-center p-1 shadow-sm">
+        <div className="w-10 h-10 rounded-2xl bg-[#FEF3DC] border border-[#F5A623]/30 flex items-center justify-center p-1 flex-shrink-0">
           <NailongAvatar className="w-7 h-7" animated />
         </div>
       </div>
 
       {/* Prompts Bar */}
-      <div className="bg-white px-4 py-2.5 border-b border-[#E2EBE7] flex gap-2 overflow-x-auto no-scrollbar">
+      <div className="bg-white px-4 py-2.5 border-b border-[#E2EBE7] flex gap-2 overflow-x-auto no-scrollbar flex-shrink-0">
         {quickPrompts.map((p, i) => (
           <button
             key={i}
             onClick={() => handleSend(p.query)}
-            className="px-3 py-1.5 rounded-full bg-[#EBF7F1] hover:bg-[#d8efe3] text-[#1A6B4A] text-xs font-bold whitespace-nowrap active:scale-95 transition-transform border border-[#1A6B4A]/15 flex-shrink-0"
+            className="px-3.5 py-2 rounded-full bg-[#EBF7F1] hover:bg-[#d8efe3] text-[#1A6B4A] text-xs font-bold whitespace-nowrap active:scale-95 transition-transform border border-[#1A6B4A]/20 flex-shrink-0"
           >
             {p.label}
           </button>
@@ -197,20 +203,20 @@ export default function AsistenAI() {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 p-4 space-y-3.5 overflow-y-auto">
+      <div className="flex-1 p-4 space-y-3.5 overflow-y-auto no-scrollbar">
         {messages.map((m) => (
           <div
             key={m.id}
             className={`flex flex-col ${m.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl p-3.5 text-xs leading-relaxed shadow-sm ${
+              className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed shadow-xs ${
                 m.sender === 'user'
                   ? 'bg-[#1A6B4A] text-white rounded-tr-none'
                   : 'bg-white text-[#111F1A] border border-[#E2EBE7] rounded-tl-none'
               }`}
             >
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {m.text.split('\n').map((line, li) => (
                   <p key={li} dangerouslySetInnerHTML={{
                     __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -219,26 +225,26 @@ export default function AsistenAI() {
               </div>
 
               {m.action && (
-                <div className="mt-3 pt-2.5 border-t border-[#E2EBE7]">
+                <div className="mt-3 pt-3 border-t border-[#E2EBE7]">
                   <Button
                     full
-                    size="sm"
+                    size="md"
                     variant="primary"
                     onClick={() => handleAction(m.action)}
                   >
-                    ⚡ {m.action.label}
+                    <Sparkles size={16} /> {m.action.label}
                   </Button>
                 </div>
               )}
             </div>
-            <span className="text-[10px] text-[#8FA89E] mt-1 px-1">{m.time}</span>
+            <span className="text-xs text-[#5F7A6E] mt-1 px-1">{m.time}</span>
           </div>
         ))}
 
         {isTyping && (
-          <div className="flex items-center gap-2 text-xs text-[#8FA89E] bg-white border border-[#E2EBE7] px-3.5 py-2 rounded-2xl rounded-tl-none w-36 shadow-sm">
+          <div className="flex items-center gap-2 text-xs text-[#5F7A6E] bg-white border border-[#E2EBE7] px-3.5 py-2 rounded-2xl rounded-tl-none w-36 shadow-xs">
             <NailongAvatar className="w-4 h-4" animated />
-            <span className="font-bold text-[#1A6B4A]">PatunganAI</span>
+            <span className="font-bold text-[#1A6B4A]">patuAI</span>
             <span className="flex gap-1 items-center">
               <span className="w-1.5 h-1.5 bg-[#1A6B4A] rounded-full animate-bounce" />
               <span className="w-1.5 h-1.5 bg-[#1A6B4A] rounded-full animate-bounce [animation-delay:0.2s]" />
@@ -250,8 +256,8 @@ export default function AsistenAI() {
         <div ref={chatEndRef} />
       </div>
 
-      {/* Input Form */}
-      <div className="fixed bottom-0 inset-x-0 max-w-md mx-auto p-3 bg-white border-t border-[#E2EBE7] z-20">
+      {/* Input Form at bottom */}
+      <div className="p-3 bg-white border-t border-[#E2EBE7] flex-shrink-0">
         <form
           onSubmit={(e) => {
             e.preventDefault()
@@ -259,29 +265,30 @@ export default function AsistenAI() {
           }}
           className="flex items-center gap-2"
         >
-          <div className="flex-1 bg-[#F4F7F5] border border-[#E2EBE7] rounded-2xl px-3.5 py-2 flex items-center gap-2 focus-within:border-[#1A6B4A]">
+          <div className="flex-1 bg-[#F4F7F5] border border-[#D5E2DC] rounded-2xl px-4 py-2.5 flex items-center gap-2 focus-within:border-[#1A6B4A] focus-within:bg-white transition-colors">
             <input
               type="text"
-              placeholder="Ketik pertanyaan untuk Asisten AI Tarunesha..."
+              placeholder="Ketik pertanyaan untuk patuAI..."
               value={inputPesan}
               onChange={e => setInputPesan(e.target.value)}
-              className="w-full bg-transparent text-xs text-[#111F1A] focus:outline-none placeholder-[#8FA89E]"
+              className="w-full bg-transparent text-base text-[#111F1A] focus:outline-none placeholder-[#5F7A6E]"
             />
             <button
               type="button"
               onClick={() => handleSend('Cek status iuran saya bulan ini')}
-              title="Input Suara AI"
-              className="text-[#8FA89E] hover:text-[#1A6B4A] text-sm active:scale-90"
+              title="Input Suara"
+              className="w-9 h-9 flex items-center justify-center text-[#5F7A6E] hover:text-[#1A6B4A] active:scale-90"
             >
-              🎙️
+              <Mic size={18} />
             </button>
           </div>
           <button
             type="submit"
             disabled={!inputPesan.trim()}
-            className="w-10 h-10 rounded-2xl bg-[#1A6B4A] disabled:opacity-40 text-white flex items-center justify-center text-sm font-bold active:scale-90 transition-transform shadow-md"
+            className="w-12 h-12 rounded-2xl bg-[#1A6B4A] disabled:opacity-40 text-white flex items-center justify-center font-bold active:scale-95 transition-transform shadow-xs flex-shrink-0"
+            aria-label="Kirim"
           >
-            ➤
+            <Send size={18} />
           </button>
         </form>
       </div>

@@ -1,15 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Card from '../../components/Card'
+import { ArrowLeft, ChevronDown, MessageSquare, Phone } from 'lucide-react'
 
 const faqList = [
   {
     q: 'Apakah Patungan Bank adalah bank umum?',
-    a: 'Bukan. Patungan Bank adalah aplikasi tata kelola keuangan gotong royong digital khusus warga Tarunesha. Sistem ini mengelola iuran wajib, tabungan sukarela, arisan, serta pinjaman mikro produktif secara transparan.'
+    a: 'Bukan. Patungan Bank adalah aplikasi tata kelola keuangan gotong royong digital khusus warga Tarunesha RT 05. Sistem ini mengelola iuran wajib, tabungan sukarela, arisan, serta pinjaman modal kerja mikro secara transparan.'
   },
   {
     q: 'Bagaimana jika warga belum memiliki smartphone atau rekening bank?',
-    a: 'Bendahara menyediakan Mode Bantuan Tunai. Warga dapat menyetorkan uang tunai saat pertemuan RT atau pos ronda, dan Bendahara akan mencatatnya ke dalam sistem secara real-time.'
+    a: 'Pengurus menyediakan Mode Bantuan Tunai. Warga dapat menyetorkan uang tunai saat pertemuan RT atau pos ronda, dan Bendahara akan mencatatnya ke dalam sistem secara real-time.'
   },
   {
     q: 'Bagaimana cara kerja undian arisan digital?',
@@ -17,7 +18,7 @@ const faqList = [
   },
   {
     q: 'Apa syarat mengajukan pembiayaan pertanian atau perikanan?',
-    a: 'Anggota memiliki Skor Kelayakan minimal 70 poin, aktif membayar iuran rutin tanpa tunggakan lebih dari 1 bulan, menyertakan foto lahan/kolam usaha, serta memiliki penjamin sesama anggota warga.'
+    a: 'Anggota memiliki Skor Kelayakan minimal 70 poin, aktif membayar iuran rutin tanpa tunggakan lebih dari 1 bulan, menyertakan tujuan penggunaan modal, serta memiliki penjamin sesama anggota warga.'
   },
   {
     q: 'Apakah ada potongan atau biaya admin transaksi?',
@@ -26,9 +27,9 @@ const faqList = [
 ]
 
 const kontakPengurus = [
-  { nama: 'Pak Mulyono (Ketua)', peran: 'Persetujuan & Kebijakan', no: '+62 811-0099-8877', wa: 'https://wa.me/6281100998877' },
-  { nama: 'Ibu Siti Rahayu (Bendahara)', peran: 'Verifikasi & Bantuan Tunai', no: '+62 813-1122-3344', wa: 'https://wa.me/6281311223344' },
-  { nama: 'Mbak Dewi Lestari (Sekretaris)', peran: 'Keanggotaan & Data Rapat', no: '+62 817-9988-1122', wa: 'https://wa.me/6281799881122' },
+  { nama: 'H. Bambang Sujatmiko (Ketua RT)', peran: 'Persetujuan & Kebijakan', no: '+62 811-2233-4455' },
+  { nama: 'Siti Rahayu, S.E. (Bendahara)', peran: 'Verifikasi & Bantuan Tunai', no: '+62 812-9876-5432' },
+  { nama: 'Hendra Pratama, S.Kom. (Sekretaris)', peran: 'Keanggotaan & Data Rapat', no: '+62 813-4567-8901' },
 ]
 
 export default function Bantuan() {
@@ -36,42 +37,48 @@ export default function Bantuan() {
   const [openIndex, setOpenIndex] = useState(0)
 
   return (
-    <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pt-12 pb-24">
+    <div className="w-full h-full flex flex-col bg-[#F4F7F5] overflow-y-auto no-scrollbar pb-24">
       {/* Header */}
-      <div className="bg-white px-5 py-4 border-b border-[#E2EBE7] flex items-center gap-3 sticky top-0 z-10">
-        <button onClick={() => navigate(-1)} className="text-[#1A6B4A] font-bold active:scale-95 transition-transform">←</button>
-        <h1 className="text-[#111F1A] font-bold text-base flex-1">Pusat Bantuan & FAQ</h1>
+      <div className="bg-white px-4 py-3.5 border-b border-[#E2EBE7] flex items-center gap-2 sticky top-0 z-10 pt-12">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-11 h-11 -ml-2 rounded-full flex items-center justify-center text-[#1A6B4A] hover:bg-[#E6F4EE] active:scale-95 transition-all"
+          aria-label="Kembali"
+        >
+          <ArrowLeft size={22} />
+        </button>
+        <h1 className="text-[#111F1A] font-bold text-base flex-1">Pusat Bantuan &amp; FAQ</h1>
       </div>
 
-      <div className="p-4 space-y-5">
-        {/* Banner */}
-        <div className="bg-gradient-to-br from-[#1A6B4A] to-[#2D8B63] rounded-2xl p-5 text-white">
-          <p className="text-xs uppercase tracking-wider text-white/70 font-semibold mb-1">Butuh Panduan?</p>
-          <h2 className="text-lg font-extrabold">Bantuan & Layanan Anggota</h2>
-          <p className="text-xs text-white/85 mt-1 leading-relaxed">
-            Temukan jawaban seputar iuran, pinjaman modal kerja, dan tata kelola kas Tarunesha.
+      <div className="px-4 py-4 space-y-4">
+        {/* Banner Solid */}
+        <div className="bg-[#1A6B4A] rounded-2xl p-5 text-white shadow-xs">
+          <p className="text-xs uppercase tracking-wider text-white/90 font-bold mb-1">Pusat Informasi</p>
+          <h2 className="text-lg font-black">Bantuan Warga Tarunesha</h2>
+          <p className="text-sm text-white/90 mt-1 leading-relaxed">
+            Temukan panduan lengkap seputar pembayaran iuran, pinjaman modal gotong royong, dan arisan warga.
           </p>
         </div>
 
         {/* FAQ Accordion */}
         <div>
-          <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-3 px-1">Pertanyaan Sering Diajukan</p>
+          <h3 className="text-sm font-bold text-[#111F1A] mb-2 px-1">Pertanyaan Umum (FAQ)</h3>
           <Card className="divide-y divide-[#E2EBE7]">
             {faqList.map((item, idx) => {
               const isOpen = openIndex === idx
               return (
                 <div key={idx} className="p-4">
                   <button
-                    onClick={() => setOpenIndex(isOpen ? null : idx)}
+                    onClick={() => setOpenIndex(isOpen ? -1 : idx)}
                     className="w-full flex items-center justify-between text-left gap-3"
                   >
-                    <span className="text-sm font-bold text-[#111F1A]">{item.q}</span>
-                    <span className={`text-sm text-[#1A6B4A] transform transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-                      ▼
+                    <span className="font-bold text-sm text-[#111F1A]">{item.q}</span>
+                    <span className={`text-[#1A6B4A] transition-transform ${isOpen ? 'rotate-180' : ''}`}>
+                      <ChevronDown size={18} />
                     </span>
                   </button>
                   {isOpen && (
-                    <p className="text-xs text-[#4A6358] mt-2.5 leading-relaxed bg-[#F4F7F5] p-3 rounded-xl">
+                    <p className="text-sm text-[#456355] mt-2.5 leading-relaxed pt-1">
                       {item.a}
                     </p>
                   )}
@@ -81,35 +88,34 @@ export default function Bantuan() {
           </Card>
         </div>
 
-        {/* Kontak Pengurus */}
+        {/* Kontak Pengurus RT */}
         <div>
-          <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-3 px-1">Kontak Pengurus Tarunesha</p>
-          <div className="space-y-2">
-            {kontakPengurus.map((p, i) => (
-              <Card key={i} className="p-4 flex items-center justify-between gap-3">
+          <h3 className="text-sm font-bold text-[#111F1A] mb-2 px-1">Kontak Pengurus RT 05</h3>
+          <div className="space-y-2.5">
+            {kontakPengurus.map((k, i) => (
+              <Card key={i} className="p-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-bold text-[#111F1A]">{p.nama}</p>
-                  <p className="text-xs text-[#8FA89E]">{p.peran}</p>
-                  <p className="text-xs text-[#1A6B4A] font-semibold mt-1">{p.no}</p>
+                  <p className="font-bold text-sm text-[#111F1A]">{k.nama}</p>
+                  <p className="text-xs text-[#5F7A6E] mt-0.5">{k.peran}</p>
+                  <p className="text-xs font-mono text-[#1A6B4A] font-bold mt-1">{k.no}</p>
                 </div>
                 <a
-                  href={p.wa}
+                  href={`https://wa.me/${k.no.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="bg-[#25D366] text-white text-xs font-bold px-3.5 py-2 rounded-full flex items-center gap-1.5 active:scale-95 transition-transform shadow-sm"
+                  className="px-3 py-2 bg-[#E6F4EE] text-[#1A6B4A] rounded-xl text-xs font-bold flex items-center gap-1 active:scale-95 shadow-xs"
                 >
-                  <span>💬</span> WhatsApp
+                  <MessageSquare size={14} /> WhatsApp
                 </a>
               </Card>
             ))}
           </div>
         </div>
 
-        {/* Disclaimer Hukum */}
-        <div className="bg-[#FEF3DC] border border-[#F5A623]/30 rounded-2xl p-4 text-xs text-[#7A5000] leading-relaxed">
-          <strong className="block mb-1 text-sm">⚖️ Pemberitahuan Hukum Penting</strong>
-          Patungan Bank bukan bank umum atau lembaga keuangan yang diawasi oleh Otoritas Jasa Keuangan (OJK). Seluruh simpanan dan pembiayaan dikelola secara internal oleh dan untuk warga komunitas Tarunesha berlandaskan asas musyawarah gotong royong.
-        </div>
+        {/* Legal Disclaimer */}
+        <p className="text-xs text-[#5F7A6E] text-center px-4 leading-relaxed pt-2">
+          Patungan Bank bukan lembaga perbankan komersial. Seluruh simpanan dan pembiayaan dikelola bersama oleh dan untuk warga komunitas Tarunesha berlandaskan asas musyawarah.
+        </p>
       </div>
     </div>
   )

@@ -4,59 +4,68 @@ import { rp, shortRp } from '../lib/format'
 import Card from '../components/Card'
 import Button from '../components/Button'
 import { useBankStore } from '../store/useBankStore'
+import {
+  CreditCard,
+  Users,
+  FileText,
+  CheckCircle2,
+  AlertTriangle,
+  Clock,
+  ArrowDownLeft,
+  ArrowUpRight,
+  Filter,
+  Heart,
+  QrCode,
+  Wallet
+} from 'lucide-react'
 
-const tabs = ['Iuran Wajib', 'Iuran Sukarela', 'Kas Masuk', 'Kas Keluar', 'Laporan']
-
-const StatusPill = ({ status }) => {
-  const cfg = {
-    lunas:   { cls: 'bg-[#E6F4EE] text-[#1A6B4A]', label: '✓ Lunas'  },
-    belum:   { cls: 'bg-[#FDEAEA] text-[#E84040]',  label: 'Belum'    },
-    telat:   { cls: 'bg-[#FDEAEA] text-[#E84040]',  label: '! Telat'  },
-    pending: { cls: 'bg-[#FEF3DC] text-[#A05C00]',  label: '⏳ Proses' },
-  }[status] || { cls: 'bg-gray-100 text-gray-600', label: status }
-
-  return (
-    <span className={`${cfg.cls} text-[11px] font-bold px-3 py-1.5 rounded-full whitespace-nowrap`}>
-      {cfg.label}
-    </span>
-  )
-}
+const TABS = [
+  { id: 'iuran',   label: 'Iuran Saya',   icon: CreditCard },
+  { id: 'kas_rt',  label: 'Uang Kas RT',  icon: Users },
+  { id: 'laporan', label: 'Laporan',      icon: FileText },
+]
 
 export default function Kas() {
   const navigate = useNavigate()
   const {
     tagihanIuran,
     kasTransaksi,
+    kasSaldo,
+    kasBulanIniMasuk,
+    kasBulanIniKeluar,
     dompetSaldo,
     bayarIuranWajib,
     bayarIuranSukarela,
   } = useBankStore()
 
-  const [activeTab, setActiveTab] = useState(0)
+  const [activeTab, setActiveTab] = useState('iuran')
 
-  // State untuk modal bayar iuran wajib
+  // Sub-filter di dalam Iuran Saya
+  const [iuranSubTab, setIuranSubTab] = useState('wajib') // 'wajib' | 'sukarela'
+
+  // Sub-filter di dalam Kas RT
+  const [kasFilter, setKasFilter] = useState('semua') // 'semua' | 'masuk' | 'keluar'
+
+  // Modal bayar iuran
   const [modalBayar, setModalBayar] = useState(null)
   const [bayarNotif, setBayarNotif] = useState('')
 
-  // State untuk form iuran sukarela
+  // Form iuran sukarela
   const [sukarelaNominal, setSukarelaNominal] = useState('')
-  const [sukarelaTujuan, setSukarelaTujuan] = useState('Kas Umum')
+  const [sukarelaTujuan, setSukarelaTujuan] = useState('Kas Umum RT')
   const [sukarelaCatatan, setSukarelaCatatan] = useState('')
   const [sukarelaSukses, setSukarelaSukses] = useState(false)
-
-  const lunasCount = tagihanIuran.filter(d => d.status === 'lunas').length
-  const belumCount = tagihanIuran.filter(d => d.status !== 'lunas').length
 
   const handleEksekusiBayarDompet = (tagihanId) => {
     const success = bayarIuranWajib(tagihanId, 'dompet')
     if (success) {
-      setBayarNotif('Pembayaran berhasil dipotong dari dompet!')
+      setBayarNotif('Pembayaran berhasil dipotong dari saldo dompet!')
       setTimeout(() => {
         setModalBayar(null)
         setBayarNotif('')
       }, 1200)
     } else {
-      setBayarNotif('Saldo dompet tidak cukup! Silakan top-up atau pilih QRIS.')
+      setBayarNotif('Saldo dompet tidak cukup! Silakan isi saldo atau bayar via QRIS.')
     }
   }
 
@@ -73,294 +82,347 @@ export default function Kas() {
     }, 1500)
   }
 
+  // Filter transaksi kas RT
+  const filteredKas = kasTransaksi.filter(t => {
+    if (kasFilter === 'masuk') return t.type === 'in'
+    if (kasFilter === 'keluar') return t.type === 'out'
+    return true
+  })
+
   return (
-    <div className="w-full">
+    <div className="w-full pb-24">
 
-      {/* ── HEADER ── */}
-      <div className="bg-[#F4F7F5] pt-12 pb-2 px-5">
-        <h1 className="text-xl font-extrabold text-[#111F1A] tracking-tight">Kas Tarunesha</h1>
-        <p className="text-xs text-[#8FA89E] mt-0.5">Iuran anggota & pembukuan kas transparan</p>
+      {/* ── HEADER HALAMAN ── */}
+      <div className="bg-white border-b border-[#E2EBE7] pt-12 pb-3 px-5">
+        <h1 className="text-xl font-extrabold text-[#111F1A] tracking-tight">
+          Kas &amp; Iuran RT 05
+        </h1>
+        <p className="text-sm text-[#5F7A6E] mt-0.5">
+          Pembukuan gotong royong warga Desa Tarunesha
+        </p>
       </div>
 
-      {/* ── TAB SCROLL ── */}
-      <div className="flex gap-2 px-4 py-3 overflow-x-auto no-scrollbar">
-        {tabs.map((t, i) => (
-          <button
-            key={t}
-            onClick={() => setActiveTab(i)}
-            className={`whitespace-nowrap text-xs font-bold px-4 py-2 rounded-full transition-all flex-shrink-0 ${
-              activeTab === i
-                ? 'bg-[#1A6B4A] text-white shadow-[0_4px_12px_rgba(26,107,74,0.3)]'
-                : 'bg-white border border-[#E2EBE7] text-[#4A6358]'
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+      {/* ── 3 TAB UTAMA (MUDAH DILIHAT & TIDAK TERPOTONG) ── */}
+      <div className="bg-white px-4 py-2.5 border-b border-[#E2EBE7]">
+        <div className="grid grid-cols-3 gap-1.5 bg-[#F4F7F5] p-1 rounded-2xl">
+          {TABS.map((t) => {
+            const Icon = t.icon
+            const isActive = activeTab === t.id
+            return (
+              <button
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
+                className={`py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-1.5 transition-all ${
+                  isActive
+                    ? 'bg-[#1A6B4A] text-white shadow-xs'
+                    : 'text-[#456355] hover:text-[#111F1A]'
+                }`}
+              >
+                <Icon size={16} />
+                <span>{t.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
-      <div className="px-4 space-y-4 pb-20">
+      <div className="px-4 py-4 space-y-4">
 
-        {/* ════ TAB 0: IURAN WAJIB ════ */}
-        {activeTab === 0 && (
-          <div className="space-y-3">
-            {/* Summary pills */}
-            <div className="grid grid-cols-3 gap-2">
-              <Card className="p-3">
-                <p className="text-[10px] text-[#8FA89E] font-semibold uppercase tracking-wider mb-1">Lunas</p>
-                <p className="text-base font-extrabold text-[#1A6B4A]">{lunasCount} bln</p>
-              </Card>
-              <Card className="p-3">
-                <p className="text-[10px] text-[#8FA89E] font-semibold uppercase tracking-wider mb-1">Belum</p>
-                <p className="text-base font-extrabold text-[#E84040]">{belumCount} bln</p>
-              </Card>
-              <Card className="p-3">
-                <p className="text-[10px] text-[#8FA89E] font-semibold uppercase tracking-wider mb-1">Terkumpul</p>
-                <p className="text-base font-extrabold text-[#111F1A]">{shortRp(lunasCount * 10000)}</p>
-              </Card>
+        {/* ════════════ TAB 1: IURAN SAYA ════════════ */}
+        {activeTab === 'iuran' && (
+          <div className="space-y-4">
+            
+            {/* Sub-toggle: Wajib vs Sukarela */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIuranSubTab('wajib')}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border ${
+                  iuranSubTab === 'wajib'
+                    ? 'bg-[#E6F4EE] border-[#1A6B4A] text-[#1A6B4A]'
+                    : 'bg-white border-[#E2EBE7] text-[#5F7A6E]'
+                }`}
+              >
+                Iuran Wajib Bulanan
+              </button>
+              <button
+                onClick={() => setIuranSubTab('sukarela')}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all border ${
+                  iuranSubTab === 'sukarela'
+                    ? 'bg-[#E6F4EE] border-[#1A6B4A] text-[#1A6B4A]'
+                    : 'bg-white border-[#E2EBE7] text-[#5F7A6E]'
+                }`}
+              >
+                Iuran Sukarela &amp; Donasi
+              </button>
             </div>
 
-            {/* List */}
-            <div className="space-y-2.5">
-              {tagihanIuran.map((item) => (
-                <Card key={item.id} className="p-4 flex items-center gap-3">
-                  <div className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${
-                    item.telat ? 'bg-[#FDEAEA]' : 'bg-[#F4F7F5]'
-                  }`}>
-                    <span className={`text-[11px] font-bold uppercase ${item.telat ? 'text-[#E84040]' : 'text-[#4A6358]'}`}>
-                      {item.bln}
-                    </span>
-                    <span className="text-[9px] text-[#8FA89E]">{item.thn}</span>
+            {/* Sub Tab: Iuran Wajib */}
+            {iuranSubTab === 'wajib' && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-sm font-bold text-[#111F1A]">Daftar Tagihan Iuran</h3>
+                  <span className="text-xs text-[#5F7A6E]">Rp 10.000 / bulan</span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {tagihanIuran.map((t) => {
+                    const isLunas = t.status === 'lunas'
+                    const isPending = t.status === 'pending'
+                    const isTelat = t.telat && !isLunas && !isPending
+
+                    return (
+                      <Card key={t.id} className="p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              {isLunas ? (
+                                <span className="bg-[#E6F4EE] text-[#1A6B4A] text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                  <CheckCircle2 size={13} /> Lunas
+                                </span>
+                              ) : isPending ? (
+                                <span className="bg-[#FEF3DC] text-[#A05C00] text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                  <Clock size={13} /> Sedang Diverifikasi
+                                </span>
+                              ) : isTelat ? (
+                                <span className="bg-[#FDEAEA] text-[#E84040] text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                  <AlertTriangle size={13} /> Terlambat
+                                </span>
+                              ) : (
+                                <span className="bg-[#FEF3DC] text-[#A05C00] text-xs font-bold px-2.5 py-0.5 rounded-full">
+                                  Belum Dibayar
+                                </span>
+                              )}
+                              <span className="text-xs text-[#5F7A6E]">
+                                Tempo: {t.jatuhTempo}
+                              </span>
+                            </div>
+
+                            <p className="text-base font-bold text-[#111F1A]">{t.judul}</p>
+                            <p className="text-lg font-black text-[#1A6B4A] mt-0.5">{rp(t.nominal)}</p>
+                          </div>
+
+                          {!isLunas && !isPending && (
+                            <Button
+                              variant={isTelat ? 'danger' : 'primary'}
+                              size="sm"
+                              onClick={() => setModalBayar(t)}
+                              className="self-center"
+                            >
+                              Bayar
+                            </Button>
+                          )}
+
+                          {isLunas && (
+                            <button
+                              onClick={() => navigate('/kas/bukti', { state: { tagihan: t } })}
+                              className="self-center text-xs text-[#1A6B4A] font-bold underline p-1"
+                            >
+                              Lihat Bukti
+                            </button>
+                          )}
+                        </div>
+                      </Card>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Sub Tab: Iuran Sukarela */}
+            {iuranSubTab === 'sukarela' && (
+              <Card className="p-4 space-y-4">
+                <div>
+                  <h3 className="text-base font-bold text-[#111F1A]">Kirim Iuran Sukarela / Infak</h3>
+                  <p className="text-sm text-[#5F7A6E] mt-0.5">
+                    Sumbangan sukarela warga untuk kas kebersihan, keamanan, atau sarana RT.
+                  </p>
+                </div>
+
+                {sukarelaSukses && (
+                  <div className="bg-[#E6F4EE] border border-[#1A6B4A] text-[#1A6B4A] text-sm font-bold p-3 rounded-xl text-center">
+                    ✓ Terima kasih! Iuran sukarela berhasil dikirim.
+                  </div>
+                )}
+
+                <form onSubmit={handleKirimSukarela} className="space-y-3.5">
+                  <div>
+                    <label className="text-sm font-bold text-[#2D4539] block mb-1">
+                      Pilih Pos Kas
+                    </label>
+                    <select
+                      value={sukarelaTujuan}
+                      onChange={e => setSukarelaTujuan(e.target.value)}
+                      className="w-full bg-[#F4F7F5] border border-[#D5E2DC] rounded-xl px-4 py-3 text-base text-[#111F1A] focus:outline-none focus:border-[#1A6B4A]"
+                    >
+                      <option value="Kas Umum RT">Kas Umum RT 05</option>
+                      <option value="Dana Kebersihan & Sampah">Dana Kebersihan &amp; Sampah</option>
+                      <option value="Pos Satpam & Keamanan">Pos Satpam &amp; Keamanan</option>
+                      <option value="Perbaikan Jalan & Fasilitas">Perbaikan Sarana &amp; Fasilitas</option>
+                    </select>
                   </div>
 
+                  <div>
+                    <label className="text-sm font-bold text-[#2D4539] block mb-1">
+                      Nominal Donasi (Rp)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Contoh: 25000"
+                      value={sukarelaNominal}
+                      onChange={e => setSukarelaNominal(e.target.value)}
+                      className="w-full bg-[#F4F7F5] border border-[#D5E2DC] rounded-xl px-4 py-3 text-base text-[#111F1A] focus:outline-none focus:border-[#1A6B4A]"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-bold text-[#2D4539] block mb-1">
+                      Catatan / Doa (Opsional)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Semoga bermanfaat untuk lingkungan"
+                      value={sukarelaCatatan}
+                      onChange={e => setSukarelaCatatan(e.target.value)}
+                      className="w-full bg-[#F4F7F5] border border-[#D5E2DC] rounded-xl px-4 py-3 text-base text-[#111F1A] focus:outline-none focus:border-[#1A6B4A]"
+                    />
+                  </div>
+
+                  <Button full size="md" variant="primary" type="submit">
+                    Kirim Iuran Sukarela
+                  </Button>
+                </form>
+              </Card>
+            )}
+
+          </div>
+        )}
+
+        {/* ════════════ TAB 2: UANG KAS RT (GABUNG MASUK & KELUAR DENGAN FILTER) ════════════ */}
+        {activeTab === 'kas_rt' && (
+          <div className="space-y-4">
+            
+            {/* Ringkasan Kas */}
+            <Card className="p-4 bg-white border border-[#D5E2DC]">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-bold text-[#5F7A6E]">Total Saldo Kas RT 05</span>
+                <span className="text-xs font-bold text-[#1A6B4A] bg-[#E6F4EE] px-2.5 py-0.5 rounded-full">
+                  Diawasi Warga
+                </span>
+              </div>
+              <p className="text-2xl font-black text-[#111F1A]">{rp(kasSaldo)}</p>
+
+              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#E2EBE7]">
+                <div>
+                  <p className="text-xs text-[#5F7A6E]">Total Pemasukan</p>
+                  <p className="text-sm font-bold text-[#1A6B4A] mt-0.5">+{shortRp(kasBulanIniMasuk)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-[#5F7A6E]">Total Pengeluaran</p>
+                  <p className="text-sm font-bold text-[#E84040] mt-0.5">-{shortRp(kasBulanIniKeluar)}</p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Filter Pills */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-[#111F1A]">Catatan Transaksi Kas</h3>
+              <div className="flex gap-1 bg-[#F4F7F5] p-1 rounded-xl">
+                {['semua', 'masuk', 'keluar'].map(f => (
+                  <button
+                    key={f}
+                    onClick={() => setKasFilter(f)}
+                    className={`px-3 py-1 rounded-lg text-xs font-bold capitalize transition-all ${
+                      kasFilter === f
+                        ? 'bg-white text-[#1A6B4A] shadow-xs'
+                        : 'text-[#5F7A6E]'
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* List Transaksi Kas RT */}
+            <div className="space-y-2.5">
+              {filteredKas.map((t) => (
+                <Card key={t.id} className="p-3.5 flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                    t.type === 'in' ? 'bg-[#E6F4EE] text-[#1A6B4A]' : 'bg-[#FDEAEA] text-[#E84040]'
+                  }`}>
+                    {t.type === 'in' ? <ArrowDownLeft size={20} /> : <ArrowUpRight size={20} />}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#111F1A] truncate">{item.judul}</p>
-                    <p className="text-xs text-[#8FA89E] mt-0.5">
-                      {rp(item.nominal)} · {item.status === 'lunas' ? 'Lunas' : `Jatuh tempo: ${item.jatuhTempo}`}
+                    <p className="text-sm font-bold text-[#111F1A] truncate">{t.keterangan}</p>
+                    <p className="text-xs text-[#5F7A6E] mt-0.5">
+                      {t.tanggal} · {t.kategori}
                     </p>
                   </div>
-
-                  {item.status === 'lunas' || item.status === 'pending' ? (
-                    <StatusPill status={item.status} />
-                  ) : (
-                    <Button
-                      variant={item.telat ? 'danger' : 'primary'}
-                      size="sm"
-                      onClick={() => setModalBayar(item)}
-                    >
-                      Bayar
-                    </Button>
-                  )}
+                  <p className={`text-base font-extrabold flex-shrink-0 ${
+                    t.type === 'in' ? 'text-[#1A6B4A]' : 'text-[#E84040]'
+                  }`}>
+                    {t.type === 'in' ? '+' : '-'}{shortRp(Math.abs(t.nominal))}
+                  </p>
                 </Card>
               ))}
             </div>
 
-            {/* Shortcut ke Iuran Sukarela */}
-            <Card
-              onClick={() => setActiveTab(1)}
-              className="p-4 flex items-center gap-4 cursor-pointer hover:bg-[#F9FAF9] transition-all"
-            >
-              <div className="w-11 h-11 bg-[#FEF3DC] rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-                🎁
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-bold text-[#111F1A]">Iuran Sukarela</p>
-                <p className="text-xs text-[#8FA89E]">Sumbangan sukarela nominal bebas</p>
-              </div>
-              <span className="text-[#1A6B4A] font-bold text-sm">Buka →</span>
-            </Card>
           </div>
         )}
 
-        {/* ════ TAB 1: IURAN SUKARELA ════ */}
-        {activeTab === 1 && (
+        {/* ════════════ TAB 3: LAPORAN ════════════ */}
+        {activeTab === 'laporan' && (
           <div className="space-y-4">
-            <div className="bg-[#FEF3DC] border border-[#F5A623]/30 rounded-2xl p-4 text-xs text-[#7A5000] leading-relaxed">
-              <strong className="block font-bold text-sm mb-1">🎁 Sumbangan Bebas & Transparan</strong>
-              Iuran tidak wajib dapat disalurkan secara sukarela untuk penambahan kas umum, konsumsi kegiatan gotong royong, atau dana sosial warga yang tertimpa musibah.
-            </div>
-
-            {sukarelaSukses ? (
-              <div className="bg-white rounded-2xl p-6 text-center border border-[#E2EBE7]">
-                <span className="text-4xl animate-bounce">💖</span>
-                <p className="font-bold text-[#111F1A] mt-2">Terima kasih atas kontribusi Anda!</p>
-                <p className="text-xs text-[#4A6358] mt-1">Sumbangan telah dicatat secara resmi ke buku kas.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleKirimSukarela} className="space-y-4">
-                <div>
-                  <label className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest block mb-1.5 px-1">
-                    Pilihan Alokasi Tujuan
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['Kas Umum', 'Kegiatan', 'Dana Sosial'].map(t => (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => setSukarelaTujuan(t)}
-                        className={`py-2.5 rounded-xl border text-xs font-bold transition-all ${
-                          sukarelaTujuan === t
-                            ? 'border-[#1A6B4A] bg-[#E8F4EE] text-[#1A6B4A]'
-                            : 'border-[#E2EBE7] bg-white text-[#4A6358]'
-                        }`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest block mb-1.5 px-1">
-                    Nominal Sumbangan (Bebas)
-                  </label>
-                  <div className="grid grid-cols-3 gap-2 mb-2">
-                    {[20000, 50000, 100000].map(nom => (
-                      <button
-                        key={nom}
-                        type="button"
-                        onClick={() => setSukarelaNominal(nom.toString())}
-                        className={`py-2 rounded-xl border text-xs font-semibold ${
-                          sukarelaNominal === nom.toString()
-                            ? 'bg-[#1A6B4A] text-white border-[#1A6B4A]'
-                            : 'bg-white text-[#111F1A] border-[#E2EBE7]'
-                        }`}
-                      >
-                        {shortRp(nom)}
-                      </button>
-                    ))}
-                  </div>
-                  <input
-                    type="number"
-                    placeholder="Atau masukkan nominal bebas (Rp)"
-                    value={sukarelaNominal}
-                    onChange={e => setSukarelaNominal(e.target.value)}
-                    className="w-full border border-[#E2EBE7] rounded-xl px-4 py-3 text-sm font-bold bg-white focus:outline-none focus:border-[#1A6B4A]"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest block mb-1 px-1">
-                    Catatan / Pesan Singkat (Opsional)
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Contoh: Titipan untuk konsumsi kerja bakti"
-                    value={sukarelaCatatan}
-                    onChange={e => setSukarelaCatatan(e.target.value)}
-                    className="w-full border border-[#E2EBE7] rounded-xl px-4 py-2.5 text-xs bg-white focus:outline-none focus:border-[#1A6B4A]"
-                  />
-                </div>
-
-                <Button type="submit" variant="primary" full size="lg">
-                  Salurkan Sumbangan Kas ✨
-                </Button>
-              </form>
-            )}
-          </div>
-        )}
-
-        {/* ════ TAB 2: KAS MASUK ════ */}
-        {activeTab === 2 && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest">Pemasukan Kas Tercatat</p>
-              <span className="text-xs text-[#1A6B4A] font-bold">Real-time</span>
-            </div>
-            <Card>
-              {kasTransaksi
-                .filter(k => k.jenis === 'masuk')
-                .map((item, i, arr) => (
-                  <div
-                    key={item.id || i}
-                    className={`p-4 flex items-center gap-3 ${i < arr.length - 1 ? 'border-b border-[#F4F7F5]' : ''}`}
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-[#E6F4EE] flex items-center justify-center text-lg text-[#1A6B4A]">
-                      📥
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#111F1A] truncate">{item.judul}</p>
-                      <p className="text-xs text-[#8FA89E]">{item.tgl} · Oleh: {item.oleh}</p>
-                    </div>
-                    <p className="text-sm font-bold text-[#1A6B4A]">
-                      +{rp(item.nominal)}
-                    </p>
-                  </div>
-                ))}
-            </Card>
-          </div>
-        )}
-
-        {/* ════ TAB 3: KAS KELUAR ════ */}
-        {activeTab === 3 && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-1">
-              <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest">Pengeluaran Wajib Nota</p>
-              <span className="text-xs text-[#E84040] font-bold">Diawasi Bersama</span>
-            </div>
-            <Card>
-              {kasTransaksi
-                .filter(k => k.jenis === 'keluar')
-                .map((item, i, arr) => (
-                  <div
-                    key={item.id || i}
-                    className={`p-4 flex items-center gap-3 ${i < arr.length - 1 ? 'border-b border-[#F4F7F5]' : ''}`}
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-[#FAEAEA] flex items-center justify-center text-lg text-[#E84040]">
-                      📤
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#111F1A] truncate">{item.judul}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-xs text-[#8FA89E]">{item.tgl}</span>
-                        {item.nota && (
-                          <span className="text-[10px] bg-[#E2EBE7] text-[#4A6358] px-2 py-0.5 rounded-full font-semibold">
-                            🧾 {item.nota}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-sm font-bold text-[#E84040]">
-                      -{rp(item.nominal)}
-                    </p>
-                  </div>
-                ))}
-            </Card>
-          </div>
-        )}
-
-        {/* ════ TAB 4: LAPORAN ════ */}
-        {activeTab === 4 && (
-          <div className="space-y-4">
-            <div className="bg-gradient-to-r from-[#1A6B4A] to-[#2D8B63] rounded-2xl p-5 text-white flex items-center justify-between">
-              <div>
-                <p className="text-xs text-white/70 font-semibold uppercase tracking-wider">Laporan Keuangan Resmi</p>
-                <h3 className="text-lg font-extrabold mt-1">Buku Kas Periode 2026</h3>
-                <p className="text-xs text-white/80 mt-1">Dapat diunduh dalam format PDF resmi RT 05</p>
-              </div>
-              <Button
-                variant="accent"
-                size="sm"
-                onClick={() => navigate('/kas/laporan')}
-              >
-                Buka Grafik & Unduh PDF
-              </Button>
-            </div>
-
             <Card className="p-4 space-y-3">
-              <p className="text-sm font-bold text-[#111F1A]">Ringkasan Arus Kas Bulan Berjalan</p>
-              <div className="flex justify-between text-xs text-[#4A6358] py-1 border-b border-[#E2EBE7]">
-                <span>Total Pemasukan:</span>
-                <strong className="text-[#1A6B4A]">+{rp(650000)}</strong>
+              <div className="flex items-center justify-between">
+                <h3 className="text-base font-bold text-[#111F1A]">Rekapitulasi Kas Bulan Ini</h3>
+                <span className="text-xs bg-[#E6F4EE] text-[#1A6B4A] font-bold px-2.5 py-0.5 rounded-full">
+                  November 2026
+                </span>
               </div>
-              <div className="flex justify-between text-xs text-[#4A6358] py-1 border-b border-[#E2EBE7]">
-                <span>Total Pengeluaran:</span>
-                <strong className="text-[#E84040]">-{rp(320000)}</strong>
+              <p className="text-sm text-[#5F7A6E]">
+                Laporan resmi transparansi keuangan gotong royong RT 05 Desa Tarunesha.
+              </p>
+
+              <div className="space-y-2 pt-2 border-t border-[#E2EBE7]">
+                <div className="flex justify-between text-sm py-1">
+                  <span className="text-[#5F7A6E]">Saldo Kas Awal Bulan</span>
+                  <span className="font-bold text-[#111F1A]">{rp(4490000)}</span>
+                </div>
+                <div className="flex justify-between text-sm py-1">
+                  <span className="text-[#1A6B4A] font-semibold">+ Pemasukan Iuran &amp; Donasi</span>
+                  <span className="font-bold text-[#1A6B4A]">+{rp(kasBulanIniMasuk)}</span>
+                </div>
+                <div className="flex justify-between text-sm py-1">
+                  <span className="text-[#E84040] font-semibold">- Pengeluaran Sarana &amp; Kebersihan</span>
+                  <span className="font-bold text-[#E84040]">-{rp(kasBulanIniKeluar)}</span>
+                </div>
+                <div className="flex justify-between text-base font-black py-2 border-t border-[#E2EBE7]">
+                  <span className="text-[#111F1A]">Saldo Kas Akhir Berjalan</span>
+                  <span className="text-[#1A6B4A]">{rp(kasSaldo)}</span>
+                </div>
               </div>
-              <div className="flex justify-between text-xs text-[#111F1A] font-bold py-1">
-                <span>Surplus Kas Bersih:</span>
-                <strong className="text-[#1A6B4A] font-extrabold">{rp(330000)}</strong>
+
+              <div className="pt-2">
+                <Button
+                  full
+                  size="md"
+                  variant="primary"
+                  onClick={() => navigate('/kas/laporan')}
+                >
+                  <FileText size={18} /> Buka Laporan Grafik Lengkap &amp; Unduh PDF
+                </Button>
+              </div>
+            </Card>
+
+            <Card className="p-4 space-y-2">
+              <h3 className="text-sm font-bold text-[#111F1A]">Kepatuhan Iuran Warga</h3>
+              <p className="text-xs text-[#5F7A6E]">
+                Sebanyak 42 dari 48 kepala keluarga telah melunasi iuran wajib bulan ini (87.5% disiplin).
+              </p>
+              <div className="w-full h-3 bg-[#E2EBE7] rounded-full overflow-hidden mt-2">
+                <div className="h-full bg-[#1A6B4A] rounded-full" style={{ width: '87.5%' }} />
               </div>
             </Card>
           </div>
@@ -368,74 +430,73 @@ export default function Kas() {
 
       </div>
 
-      {/* ── MODAL PILIHAN PEMBAYARAN IURAN WAJIB ── */}
+      {/* ── MODAL PILIH CARA BAYAR IURAN WAJIB ── */}
       {modalBayar && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4 animate-scale-up">
+        <div className="absolute inset-0 z-50 bg-black/60 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white w-full max-w-sm rounded-3xl p-5 shadow-2xl border border-[#E2EBE7] flex flex-col gap-4 animate-scale-up">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-base text-[#111F1A]">{modalBayar.judul}</h3>
-              <button onClick={() => setModalBayar(null)} className="text-[#8FA89E] text-lg font-bold">✕</button>
+              <h3 className="text-base font-bold text-[#111F1A]">Pembayaran Iuran</h3>
+              <button
+                onClick={() => setModalBayar(null)}
+                className="w-9 h-9 rounded-full flex items-center justify-center text-[#5F7A6E] hover:bg-gray-100 font-bold"
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="bg-[#F4F7F5] rounded-2xl p-4 text-center">
-              <p className="text-xs text-[#8FA89E]">Total Tagihan</p>
-              <p className="text-2xl font-extrabold text-[#111F1A] mt-0.5">{rp(modalBayar.nominal)}</p>
-              <p className="text-[11px] text-[#4A6358] mt-1">Jatuh tempo: {modalBayar.jatuhTempo}</p>
+            <div className="bg-[#F4F7F5] rounded-2xl p-4 border border-[#E2EBE7]">
+              <p className="text-xs text-[#5F7A6E]">Tagihan</p>
+              <p className="text-base font-bold text-[#111F1A] mt-0.5">{modalBayar.judul}</p>
+              <p className="text-2xl font-black text-[#1A6B4A] mt-1">{rp(modalBayar.nominal)}</p>
             </div>
 
             {bayarNotif && (
-              <div className={`p-3 rounded-xl text-xs font-bold text-center ${
-                bayarNotif.includes('berhasil') ? 'bg-green-50 text-[#1A6B4A]' : 'bg-red-50 text-[#E84040]'
-              }`}>
+              <div className="p-3 bg-[#FEF3DC] border border-[#F5A623] text-[#A05C00] text-xs font-bold rounded-xl text-center">
                 {bayarNotif}
               </div>
             )}
 
             <div className="space-y-2">
-              <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest px-1">Pilih Cara Bayar</p>
-
-              {/* Bayar via Dompet */}
               <button
-                type="button"
                 onClick={() => handleEksekusiBayarDompet(modalBayar.id)}
-                className="w-full p-3.5 bg-white border border-[#E2EBE7] hover:border-[#1A6B4A] rounded-2xl flex items-center justify-between text-left active:scale-98 transition-all shadow-sm"
+                className="w-full p-3.5 rounded-2xl border border-[#1A6B4A] bg-[#E6F4EE] hover:bg-[#d8efe3] flex items-center justify-between text-left active:scale-95 transition-all"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">👛</span>
+                  <div className="w-10 h-10 rounded-xl bg-[#1A6B4A] text-white flex items-center justify-center">
+                    <Wallet size={20} />
+                  </div>
                   <div>
-                    <p className="text-xs font-bold text-[#111F1A]">Potong Saldo Dompet</p>
-                    <p className="text-[10px] text-[#8FA89E]">Saldo Anda: {rp(dompetSaldo)}</p>
+                    <p className="text-sm font-bold text-[#1A6B4A]">Potong Saldo Dompet</p>
+                    <p className="text-xs text-[#5F7A6E]">Saldo tersedia: {rp(dompetSaldo)}</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-[#1A6B4A]">Bayar Langsung</span>
+                <span className="text-sm font-bold text-[#1A6B4A]">Pilih →</span>
               </button>
 
-              {/* Bayar via QRIS */}
               <button
-                type="button"
                 onClick={() => {
+                  const item = modalBayar
                   setModalBayar(null)
-                  navigate('/kas/qris')
+                  navigate('/kas/qris', { state: { tagihan: item } })
                 }}
-                className="w-full p-3.5 bg-white border border-[#E2EBE7] hover:border-[#1A6B4A] rounded-2xl flex items-center justify-between text-left active:scale-98 transition-all shadow-sm"
+                className="w-full p-3.5 rounded-2xl border border-[#D5E2DC] bg-white hover:bg-gray-50 flex items-center justify-between text-left active:scale-95 transition-all"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl">📱</span>
+                  <div className="w-10 h-10 rounded-xl bg-[#FEF3DC] text-[#A05C00] flex items-center justify-center">
+                    <QrCode size={20} />
+                  </div>
                   <div>
-                    <p className="text-xs font-bold text-[#111F1A]">Scan QRIS Dinamis</p>
-                    <p className="text-[10px] text-[#8FA89E]">BCA, GoPay, OVO, ShopeePay, dll</p>
+                    <p className="text-sm font-bold text-[#111F1A]">Bayar via QRIS</p>
+                    <p className="text-xs text-[#5F7A6E]">Gopay, OVO, Dana, BCA, Livin</p>
                   </div>
                 </div>
-                <span className="text-xs font-bold text-[#1A6B4A]">Tampilkan QR</span>
+                <span className="text-sm font-bold text-[#111F1A]">Pilih →</span>
               </button>
             </div>
-
-            <Button variant="ghost" size="sm" onClick={() => setModalBayar(null)}>
-              Tutup
-            </Button>
           </div>
         </div>
       )}
+
     </div>
   )
 }
