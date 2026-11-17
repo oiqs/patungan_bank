@@ -225,6 +225,17 @@ export const useBankStore = create(
         { id: 'u7', nama: 'Yuni Astuti', peran: 'Anggota', noHp: '+62 819-2233-4455', aktif: true, statusIuran: 'lunas' },
         { id: 'u8', nama: 'Hasan Basri', peran: 'Anggota', noHp: '+62 816-7788-9900', aktif: false, statusIuran: 'belum' },
       ],
+      // Alias anggota untuk backward compatibility
+      anggota: [
+        { id: 'u1', nama: 'Budi Santoso', peran: 'Anggota', noHp: '+62 812-3456-7890', aktif: true, statusIuran: 'belum' },
+        { id: 'u2', nama: 'Siti Rahayu', peran: 'Bendahara', noHp: '+62 813-1122-3344', aktif: true, statusIuran: 'lunas' },
+        { id: 'u3', nama: 'Ahmad Fauzi', peran: 'Anggota', noHp: '+62 815-5566-7788', aktif: true, statusIuran: 'pending' },
+        { id: 'u4', nama: 'Dewi Lestari', peran: 'Sekretaris', noHp: '+62 817-9988-1122', aktif: true, statusIuran: 'lunas' },
+        { id: 'u5', nama: 'Roni Wijaya', peran: 'Anggota', noHp: '+62 818-4433-2211', aktif: true, statusIuran: 'belum' },
+        { id: 'u6', nama: 'Pak Mulyono', peran: 'Ketua', noHp: '+62 811-0099-8877', aktif: true, statusIuran: 'lunas' },
+        { id: 'u7', nama: 'Yuni Astuti', peran: 'Anggota', noHp: '+62 819-2233-4455', aktif: true, statusIuran: 'lunas' },
+        { id: 'u8', nama: 'Hasan Basri', peran: 'Anggota', noHp: '+62 816-7788-9900', aktif: false, statusIuran: 'belum' },
+      ],
 
       // --- NOTIFIKASI ---
       notifikasi: [
@@ -648,6 +659,11 @@ export const useBankStore = create(
           }, ...state.kasTransaksi],
         }
       }),
+
+      // Aliases untuk aksi pengurus
+      verifikasiPembayaran: (id, setujui = true) => get().verifikasiPembayaranAction(id, setujui),
+      setujuiPengajuanPinjaman: (id) => get().persetujuanPinjamanAction(id, true),
+      tolakPengajuanPinjaman: (id) => get().persetujuanPinjamanAction(id, false),
 
       // PENGURUS: INPUT KAS KELUAR
       inputKasKeluar: (data) => set((state) => {

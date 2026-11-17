@@ -14,46 +14,70 @@ import {
   Check,
   X,
   FileText,
+  UserCheck,
 } from 'lucide-react'
 import Card from '../../components/Card'
 import Button from '../../components/Button'
-import { rp, shortRp } from '../../lib/format'
+import { rp } from '../../lib/format'
 import { useBankStore } from '../../store/useBankStore'
 
 export default function PanelPengurus() {
   const navigate = useNavigate()
   const {
-    currentUser,
-    kasSaldo,
-    verifikasiPembayaranPending,
-    pengajuanPinjamanPending,
-    kasKeluarPending,
+    currentUser = {},
+    kasSaldo = 0,
+    verifikasiPembayaranPending = [],
+    pengajuanPinjamanPending = [],
+    kasKeluarPending = [],
     verifikasiPembayaran,
+    verifikasiPembayaranAction,
     setujuiPengajuanPinjaman,
     tolakPengajuanPinjaman,
-    anggota,
+    persetujuanPinjamanAction,
+    anggotaList = [],
+    anggota = [],
+    loginAsPreset,
   } = useBankStore()
 
   const [pesanSukses, setPesanSukses] = useState('')
 
+  const rawAnggota = (anggotaList && anggotaList.length > 0) ? anggotaList : (anggota || [])
+  const listVerif = verifikasiPembayaranPending || []
+  const listPengajuan = pengajuanPinjamanPending || []
+  const listKasKeluar = kasKeluarPending || []
+
   const handleVerif = (id, terima) => {
-    verifikasiPembayaran(id, terima)
+    if (typeof verifikasiPembayaran === 'function') {
+      verifikasiPembayaran(id, terima)
+    } else if (typeof verifikasiPembayaranAction === 'function') {
+      verifikasiPembayaranAction(id, terima)
+    }
     setPesanSukses(terima ? 'Pembayaran berhasil diverifikasi!' : 'Pembayaran ditolak.')
     setTimeout(() => setPesanSukses(''), 2000)
   }
 
   const handlePersetujuanPinjaman = (id, setuju) => {
     if (setuju) {
-      setujuiPengajuanPinjaman(id)
+      if (typeof setujuiPengajuanPinjaman === 'function') {
+        setujuiPengajuanPinjaman(id)
+      } else if (typeof persetujuanPinjamanAction === 'function') {
+        persetujuanPinjamanAction(id, true)
+      }
       setPesanSukses('Pinjaman disetujui dan dicairkan ke anggota!')
     } else {
-      tolakPengajuanPinjaman(id)
+      if (typeof tolakPengajuanPinjaman === 'function') {
+        tolakPengajuanPinjaman(id)
+      } else if (typeof persetujuanPinjamanAction === 'function') {
+        persetujuanPinjamanAction(id, false)
+      }
       setPesanSukses('Pengajuan pinjaman ditolak.')
     }
     setTimeout(() => setPesanSukses(''), 2000)
   }
 
-  const anggotaMenunggak = anggota.filter(a => a.statusIuran !== 'lunas').length
+  const anggotaMenunggak = rawAnggota.filter(a => a?.statusIuran !== 'lunas').length
+  const currentPeran = currentUser?.peran || 'Pengurus'
+  const isPengurusAktif = ['Bendahara', 'Ketua', 'Sekretaris'].includes(currentPeran)
 
   return (
     <div className="no-scrollbar overflow-y-auto min-h-screen bg-[#F4F7F5] flex flex-col pb-24">
@@ -84,7 +108,7 @@ export default function PanelPengurus() {
             <ShieldCheck className="w-4 h-4 text-[#F5A623] stroke-[2]" />
             <span className="text-white text-xs font-bold tracking-tight">Panel Pengurus</span>
             <span className="text-[10px] bg-[#F5A623] text-[#111F1A] font-extrabold px-2 py-0.5 rounded-full">
-              {currentUser.peran}
+              {currentPeran}
             </span>
           </div>
         </div>
@@ -98,6 +122,44 @@ export default function PanelPengurus() {
       </div>
 
       <div className="flex-1 px-4 py-4 flex flex-col gap-4">
+        {/* Switch Role Quick Bar (Memudahkan Pengujian Peran Ketua/Bendahara/Sekretaris) */}
+        <div className="bg-white p-3 rounded-2xl border border-[#E2EBE7] flex items-center justify-between gap-2 shadow-xs">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <UserCheck className="w-4 h-4 text-[#1A6B4A] flex-shrink-0 stroke-[2]" />
+            <span className="text-[11px] font-bold text-[#4A6358] truncate">
+              {currentUser?.nama || 'Pengurus'}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {[
+              { key: 'bendahara', label: 'Bendahara' },
+              { key: 'ketua', label: 'Ketua' },
+              { key: 'sekretaris', label: 'Sekretaris' },
+            ].map((r) => {
+              const isActive = (currentPeran || '').toLowerCase() === r.key
+              return (
+                <button
+                  key={r.key}
+                  onClick={() => loginAsPreset && loginAsPreset(r.key)}
+                  className={`text-[10px] font-bold px-2 py-1 rounded-lg transition-all ${
+                    isActive
+                      ? 'bg-[#1A6B4A] text-white shadow-xs'
+                      : 'bg-[#F4F7F5] text-[#4A6358] hover:bg-[#E6F4EE]'
+                  }`}
+                >
+                  {r.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {!isPengurusAktif && (
+          <div className="bg-[#FEF3DC] border border-[#F5A623]/30 rounded-2xl p-3 text-xs text-[#7A5000] flex items-center justify-between gap-2">
+            <span>Saat ini Anda login sebagai <strong>Anggota</strong>. Klik tombol peran di atas untuk beralih mode.</span>
+          </div>
+        )}
+
         {/* Pesan Aksi */}
         {pesanSukses && (
           <div className="bg-[#E6F4EE] border border-[#1A6B4A]/30 text-[#1A6B4A] text-xs font-bold p-3 rounded-2xl animate-fade-in text-center flex items-center justify-center gap-1.5">
@@ -111,8 +173,8 @@ export default function PanelPengurus() {
           {[
             { label: 'Kas Tarunesha', value: rp(kasSaldo), icon: Landmark, color: 'text-[#1A6B4A]', bg: 'bg-[#E6F4EE]' },
             { label: 'Menunggak Iuran', value: `${anggotaMenunggak} warga`, icon: AlertTriangle, color: 'text-[#E84040]', bg: 'bg-[#FDEAEA]' },
-            { label: 'Verifikasi Setoran', value: `${verifikasiPembayaranPending.length} pending`, icon: ClipboardCheck, color: 'text-[#F5A623]', bg: 'bg-[#FEF3DC]' },
-            { label: 'Pengajuan Modal', value: `${pengajuanPinjamanPending.length} ajuan`, icon: Sprout, color: 'text-[#2D8B63]', bg: 'bg-[#E8F4EE]' },
+            { label: 'Verifikasi Setoran', value: `${listVerif.length} pending`, icon: ClipboardCheck, color: 'text-[#F5A623]', bg: 'bg-[#FEF3DC]' },
+            { label: 'Pengajuan Modal', value: `${listPengajuan.length} ajuan`, icon: Sprout, color: 'text-[#2D8B63]', bg: 'bg-[#E8F4EE]' },
           ].map((s, i) => {
             const Icon = s.icon
             return (
@@ -158,21 +220,21 @@ export default function PanelPengurus() {
               Verifikasi Pembayaran Masuk
             </p>
             <span className="text-xs bg-[#F5A623] text-white font-bold px-2 py-0.5 rounded-full">
-              {verifikasiPembayaranPending.length}
+              {listVerif.length}
             </span>
           </div>
 
-          {verifikasiPembayaranPending.length === 0 ? (
+          {listVerif.length === 0 ? (
             <Card className="p-5 text-center flex items-center justify-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-[#1A6B4A] stroke-[2]" />
               <p className="text-sm font-semibold text-[#1A6B4A]">Semua setoran telah diverifikasi</p>
             </Card>
           ) : (
             <div className="flex flex-col gap-2">
-              {verifikasiPembayaranPending.map((v) => (
+              {listVerif.map((v) => (
                 <Card key={v.id} className="p-3.5 flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-[#E6F4EE] flex items-center justify-center text-sm font-bold text-[#1A6B4A] flex-shrink-0">
-                    {v.nama.charAt(0)}
+                    {v.nama ? v.nama.charAt(0) : 'W'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-[#111F1A] truncate">{v.nama}</p>
@@ -207,17 +269,17 @@ export default function PanelPengurus() {
               Persetujuan Pinjaman Modal (Ketua)
             </p>
             <span className="text-xs bg-[#1A6B4A] text-white font-bold px-2 py-0.5 rounded-full">
-              {pengajuanPinjamanPending.length}
+              {listPengajuan.length}
             </span>
           </div>
 
-          {pengajuanPinjamanPending.length === 0 ? (
+          {listPengajuan.length === 0 ? (
             <Card className="p-5 text-center">
               <p className="text-sm text-[#8FA89E]">Tidak ada pengajuan pinjaman yang menunggu</p>
             </Card>
           ) : (
             <div className="flex flex-col gap-2.5">
-              {pengajuanPinjamanPending.map((p) => (
+              {listPengajuan.map((p) => (
                 <Card key={p.id} className="p-4 space-y-2.5">
                   <div className="flex items-start justify-between">
                     <div>
@@ -256,12 +318,12 @@ export default function PanelPengurus() {
           )}
         </div>
 
-        {/* Kas Keluar Pending */}
+        {/* Kas Keluar Terkini */}
         <div>
           <p className="text-[11px] font-bold text-[#4A6358] uppercase tracking-widest mb-2 px-1">
             Kas Keluar Terkini
           </p>
-          {kasKeluarPending.map((k) => (
+          {listKasKeluar.map((k) => (
             <Card key={k.id} className="p-3.5 flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#E2EBE7] flex items-center justify-center text-[#4A6358] flex-shrink-0">
                 <FileText className="w-5 h-5 stroke-[2]" />

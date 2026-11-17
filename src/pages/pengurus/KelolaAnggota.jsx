@@ -26,7 +26,7 @@ const peranColor = {
 
 export default function KelolaAnggota() {
   const navigate = useNavigate()
-  const { anggotaList, toggleAnggotaAktif, tambahAnggota } = useBankStore()
+  const { anggotaList = [], toggleAnggotaAktif, tambahAnggota } = useBankStore()
 
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('Semua')
@@ -38,8 +38,9 @@ export default function KelolaAnggota() {
   const [noHpBaru, setNoHpBaru] = useState('')
   const [peranBaru, setPeranBaru] = useState('Anggota')
 
-  const filtered = anggotaList.filter(a => {
-    const matchSearch = a.nama.toLowerCase().includes(search.toLowerCase()) || a.noHp.includes(search)
+  const listWarga = anggotaList || []
+  const filtered = listWarga.filter(a => {
+    const matchSearch = (a.nama || '').toLowerCase().includes(search.toLowerCase()) || (a.noHp || '').includes(search)
     if (filter === 'Aktif') return matchSearch && a.aktif
     if (filter === 'Nonaktif') return matchSearch && !a.aktif
     if (filter === 'Pengurus') return matchSearch && ['Ketua', 'Bendahara', 'Sekretaris'].includes(a.peran)
@@ -75,7 +76,7 @@ export default function KelolaAnggota() {
           </button>
           <h1 className="text-[#111F1A] font-bold text-base flex-1">Kelola Data Anggota</h1>
           <span className="text-xs bg-[#E6F4EE] text-[#1A6B4A] font-bold px-2.5 py-1 rounded-full">
-            {anggotaList.length} Warga
+            {listWarga.length} Warga
           </span>
         </div>
 

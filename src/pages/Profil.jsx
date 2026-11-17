@@ -25,6 +25,7 @@ export default function Profil() {
     pinjamanList,
     notifikasi,
     resetStateKeAwal,
+    loginAsPreset,
   } = useBankStore()
 
   const [modalEdit, setModalEdit] = useState(false)
@@ -146,6 +147,26 @@ export default function Profil() {
                 <p className="text-xs text-[#8FA89E] mt-0.5">PIN 6 digit, fingerprint biometrik</p>
               </div>
               <ChevronRight className="w-4 h-4 text-[#C0CCC8] stroke-[2]" />
+            </button>
+
+            {/* Akses Pengurus */}
+            <button
+              onClick={() => navigate('/pengurus')}
+              className="w-full flex items-center gap-3 p-4 text-left active:bg-[#F4F7F5] transition-colors bg-[#E6F4EE]/30"
+            >
+              <div className="w-9 h-9 bg-gradient-to-br from-[#0D4A33] to-[#1A6B4A] text-[#F5A623] rounded-xl flex items-center justify-center flex-shrink-0">
+                <ShieldCheck className="w-4 h-4 stroke-[2]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-bold text-[#111F1A]">Akses Panel Pengurus</p>
+                  <span className="text-[10px] bg-[#F5A623] text-[#111F1A] font-extrabold px-1.5 py-0.5 rounded-full">
+                    {currentUser?.peran || 'Pengurus'}
+                  </span>
+                </div>
+                <p className="text-xs text-[#8FA89E] mt-0.5">Kelola kas, verifikasi iuran & acc pinjaman warga</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-[#1A6B4A] stroke-[2]" />
             </button>
 
             <button

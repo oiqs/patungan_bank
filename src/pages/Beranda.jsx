@@ -44,7 +44,7 @@ export default function Beranda() {
     { icon: Heart,      label: 'Donasi',      bg: 'bg-[#FAEAEA]', color: 'text-[#C53030]', to: '/layanan/kegiatan' },
   ]
 
-  const isPengurus = ['Bendahara', 'Ketua', 'Sekretaris'].includes(currentUser.peran)
+  const isPengurus = ['Bendahara', 'Ketua', 'Sekretaris'].includes(currentUser?.peran)
 
   return (
     <div className="w-full">

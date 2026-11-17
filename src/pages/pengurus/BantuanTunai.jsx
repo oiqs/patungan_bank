@@ -13,15 +13,16 @@ import { useBankStore } from '../../store/useBankStore'
 
 export default function BantuanTunai() {
   const navigate = useNavigate()
-  const { anggotaList, catatBantuanTunai } = useBankStore()
+  const { anggotaList = [], catatBantuanTunai } = useBankStore()
+  const listWarga = anggotaList || []
 
-  const [selectedAnggota, setSelectedAnggota] = useState(anggotaList[0]?.id || 'a-1')
+  const [selectedAnggota, setSelectedAnggota] = useState(listWarga[0]?.id || 'u1')
   const [nominal, setNominal] = useState(10000)
   const [jenisSetoran, setJenisSetoran] = useState('Iuran Wajib')
   const [keterangan, setKeterangan] = useState('Uang tunai diserahkan langsung di Pos Ronda RT 05')
   const [sukses, setSukses] = useState(false)
 
-  const anggotaTerpilih = anggotaList.find(a => a.id === selectedAnggota)
+  const anggotaTerpilih = listWarga.find(a => a.id === selectedAnggota)
 
   const handleSimpan = (e) => {
     e.preventDefault()
@@ -82,7 +83,7 @@ export default function BantuanTunai() {
                 onChange={e => setSelectedAnggota(e.target.value)}
                 className="w-full border border-[#E2EBE7] rounded-xl px-4 py-3 text-xs bg-white text-[#111F1A] focus:outline-none focus:border-[#1A6B4A]"
               >
-                {anggotaList.map(a => (
+                {listWarga.map(a => (
                   <option key={a.id} value={a.id}>
                     {a.nama} ({a.noHp}) - Status: {a.statusIuran}
                   </option>
