@@ -90,9 +90,11 @@ export default function Login() {
         
         {/* App Title */}
         <div className="flex items-center gap-1.5 mb-3 bg-white/10 px-3 py-1 rounded-full border border-white/15">
-          <Sprout className="w-4 h-4 text-[#4DB87F] stroke-[2]" />
-          <span className="text-[11px] font-bold tracking-wide uppercase text-white/90">
-            Patungan Bank Tarunesha
+          <Sprout className="w-4 h-4 text-[#86EFAC] stroke-[2]" />
+          <span className="text-[11px] tracking-wide uppercase">
+            <span className="font-extrabold text-white">Patungan</span>{' '}
+            <span className="font-light text-[#86EFAC]">Bank</span>{' '}
+            <span className="text-white/80 font-normal">Tarunesha</span>
           </span>
         </div>
 

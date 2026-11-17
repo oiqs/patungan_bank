@@ -34,11 +34,14 @@ export default function PhoneMockup({ children }) {
       <div className="hidden sm:flex items-center justify-between w-full max-w-[420px] mb-2 px-2 text-xs text-[#4A6358]">
         <Link
           to="/"
-          className="flex items-center gap-1.5 font-bold text-[#1A6B4A] hover:opacity-80 transition-opacity"
+          className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
           title="Klik untuk melihat Tampilan Awal Logo"
         >
-          <Sprout className="w-4 h-4 stroke-[2.2]" />
-          <span>Patungan Bank</span>
+          <Sprout className="w-4 h-4 stroke-[2.2] text-[#1A6B4A]" />
+          <span className="tracking-tight text-xs">
+            <span className="font-extrabold text-[#1A6B4A]">Patungan</span>{' '}
+            <span className="font-normal text-[#2D8B63]">Bank</span>
+          </span>
         </Link>
         <button
           onClick={() => setUseFrame(prev => !prev)}

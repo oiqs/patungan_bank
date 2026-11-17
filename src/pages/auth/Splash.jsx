@@ -33,7 +33,10 @@ export default function Splash() {
         <div className="w-20 h-20 rounded-3xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-white shadow-xl border border-white/20">
           <Sprout className="w-10 h-10 stroke-[2]" />
         </div>
-        <h1 className="text-white text-3xl font-bold tracking-tight">Patungan Bank</h1>
+        <h1 className="text-3xl tracking-tight">
+          <span className="font-extrabold text-white">Patungan</span>{' '}
+          <span className="font-light text-[#86EFAC]">Bank</span>
+        </h1>
         <p className="text-white/70 text-sm text-center">Keuangan komunitas Tarunesha</p>
       </div>
 
