@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom'
 import { Home, Landmark, Handshake, Wallet, User } from 'lucide-react'
 
 const menu = [
-  { to: '/',        icon: Home,      label: 'Beranda' },
+  { to: '/beranda', icon: Home,      label: 'Beranda' },
   { to: '/kas',     icon: Landmark,  label: 'Kas RT'  },
   { to: '/layanan', icon: Handshake, label: 'Layanan' },
   { to: '/dompet',  icon: Wallet,    label: 'Dompet'  },
@@ -19,7 +19,7 @@ export default function BottomNav() {
             <NavLink
               key={m.to}
               to={m.to}
-              end={m.to === '/'}
+              end={m.to === '/beranda'}
               className={({ isActive }) =>
                 `flex flex-col items-center justify-center py-1 transition-all group ${
                   isActive ? 'text-[#1A6B4A]' : 'text-[#4A6358] hover:text-[#1A6B4A]'

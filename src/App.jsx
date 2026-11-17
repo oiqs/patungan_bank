@@ -5,6 +5,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 
 // auth pages
 import Splash from './pages/auth/Splash'
+import InitialScreen from './pages/auth/InitialScreen'
 import Daftar from './pages/auth/Daftar'
 import OTP from './pages/auth/OTP'
 import BuatPIN from './pages/auth/BuatPIN'
@@ -51,6 +52,9 @@ export default function App() {
     <ErrorBoundary>
       <PhoneMockup>
         <Routes>
+          {/* Tampilan Awal Logo & Branding Aplikasi */}
+          <Route path="/" element={<InitialScreen />} />
+
           {/* Auth - tanpa BottomNav */}
           <Route path="/splash" element={<Splash />} />
           <Route path="/daftar" element={<Daftar />} />
@@ -61,7 +65,7 @@ export default function App() {
           {/* Main Pages - dengan Layout & BottomNav */}
           <Route element={<Layout />}>
             {/* Core BottomNav Tabs */}
-            <Route path="/" element={<Beranda />} />
+            <Route path="/beranda" element={<Beranda />} />
             <Route path="/kas" element={<Kas />} />
             <Route path="/layanan" element={<Layanan />} />
             <Route path="/dompet" element={<Dompet />} />

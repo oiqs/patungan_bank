@@ -86,7 +86,7 @@ export default function PanelPengurus() {
         {/* Top Nav Row: Back button & Action button */}
         <div className="flex items-center justify-between mb-3">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/beranda')}
             className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center text-white active:scale-90 transition-all border border-white/20"
             title="Kembali ke Beranda"
           >

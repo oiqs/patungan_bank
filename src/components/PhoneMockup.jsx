@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { Sprout, Smartphone } from 'lucide-react'
 import { useBankStore } from '../store/useBankStore'
 import AIAssistantModal from './AIAssistantModal'
@@ -9,10 +9,11 @@ export default function PhoneMockup({ children }) {
   const [useFrame, setUseFrame] = useState(true)
   const [currentTime, setCurrentTime] = useState('09:41')
   const { pathname } = useLocation()
-  const navigate = useNavigate()
   const { isAiModalOpen, openAiModal, closeAiModal } = useBankStore()
 
   const isDedicatedAiPage = pathname === '/ai-asisten'
+  const isDarkPage = ['/', '/splash'].includes(pathname)
+  const hideFloatingAi = isDedicatedAiPage || ['/', '/splash', '/daftar', '/otp', '/buat-pin', '/login'].includes(pathname)
 
   useEffect(() => {
     const updateTime = () => {
@@ -69,7 +70,7 @@ export default function PhoneMockup({ children }) {
               <div className="absolute top-0 inset-x-0 h-[48px] z-30 pointer-events-none flex items-center justify-between px-7 pt-1">
                 
                 {/* Clock (Left) */}
-                <span className="text-[14px] font-semibold text-[#111F1A] dark:text-white tracking-tight drop-shadow-sm select-none">
+                <span className={`text-[14px] font-semibold ${isDarkPage ? 'text-white' : 'text-[#111F1A]'} tracking-tight drop-shadow-sm select-none`}>
                   {currentTime}
                 </span>
 
@@ -84,7 +85,7 @@ export default function PhoneMockup({ children }) {
                 </div>
 
                 {/* Status Icons (Right): Cellular, WiFi, Battery */}
-                <div className="flex items-center gap-1.5 text-[#111F1A] dark:text-white drop-shadow-sm select-none">
+                <div className={`flex items-center gap-1.5 ${isDarkPage ? 'text-white' : 'text-[#111F1A]'} drop-shadow-sm select-none`}>
                   {/* Cellular 4 bars */}
                   <svg className="w-4 h-3.5 fill-current" viewBox="0 0 17 12">
                     <rect x="0" y="9" width="2.5" height="3" rx="0.8" />
@@ -114,7 +115,7 @@ export default function PhoneMockup({ children }) {
                 {children}
 
                 {/* ════ ELEVATED FLOATING patuAI BUTTON (ALWAYS PINNED ABOVE BOTTOM NAV) ════ */}
-                {!isDedicatedAiPage && (
+                {!hideFloatingAi && (
                   <button
                     onClick={openAiModal}
                     className="absolute bottom-[104px] right-4 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"
@@ -129,7 +130,7 @@ export default function PhoneMockup({ children }) {
 
               {/* ════ IPHONE HOME INDICATOR (BOTTOM BAR) ════ */}
               <div className="hidden sm:flex absolute bottom-[3px] inset-x-0 h-[10px] z-50 pointer-events-none items-center justify-center">
-                <div className="w-[130px] h-[4px] bg-[#111F1A]/70 dark:bg-white/70 rounded-full backdrop-blur-sm" />
+                <div className={`w-[130px] h-[4px] ${isDarkPage ? 'bg-white/70' : 'bg-[#111F1A]/70'} rounded-full backdrop-blur-sm transition-colors`} />
               </div>
 
             </div>
@@ -140,7 +141,7 @@ export default function PhoneMockup({ children }) {
         <div className="w-full max-w-md h-[100dvh] bg-[#F4F7F5] shadow-xl relative flex flex-col overflow-hidden">
           {children}
 
-          {!isDedicatedAiPage && (
+          {!hideFloatingAi && (
             <button
               onClick={openAiModal}
               className="absolute bottom-[104px] right-4 z-50 bg-gradient-to-r from-[#0D4A33] via-[#1A6B4A] to-[#2D8B63] text-white pl-2.5 pr-3.5 py-2 rounded-full shadow-[0_8px_25px_rgba(26,107,74,0.45)] flex items-center gap-1.5 text-xs font-bold active:scale-90 transition-all border border-white/30 backdrop-blur-sm hover:scale-105"

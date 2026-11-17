@@ -50,7 +50,7 @@ export default function Login() {
     if (result.success) {
       setSuccessInfo(result.user)
       setTimeout(() => {
-        navigate('/')
+        navigate('/beranda')
       }, 700)
     } else {
       setErrorMessage('PIN tidak cocok! Silakan cek PIN demo di bawah.')
@@ -69,7 +69,7 @@ export default function Login() {
       const user = loginAsPreset(selectedRoleKey)
       setSuccessInfo(user)
       setTimeout(() => {
-        navigate('/')
+        navigate('/beranda')
       }, 700)
     }, 600)
   }

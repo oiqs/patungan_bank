@@ -77,7 +77,7 @@ export default function BuktiPembayaran() {
           size="lg"
           variant="primary"
           className="flex items-center justify-center gap-2"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/beranda')}
         >
           <Home className="w-4 h-4 stroke-[2]" />
           Kembali ke Beranda

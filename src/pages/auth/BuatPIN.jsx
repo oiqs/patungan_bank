@@ -78,7 +78,7 @@ export default function BuatPIN() {
         <Button
           full
           disabled={!isFull}
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/beranda')}
           className="max-w-xs"
         >
           Simpan PIN & Lanjut
