@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, Link } from 'react-router-dom'
 import { Sprout, Smartphone } from 'lucide-react'
 import { useBankStore } from '../store/useBankStore'
 import AIAssistantModal from './AIAssistantModal'
@@ -12,7 +12,7 @@ export default function PhoneMockup({ children }) {
   const { isAiModalOpen, openAiModal, closeAiModal } = useBankStore()
 
   const isDedicatedAiPage = pathname === '/ai-asisten'
-  const isDarkPage = ['/', '/splash'].includes(pathname)
+  const isDarkPage = ['/', '/login', '/splash'].includes(pathname)
   const hideFloatingAi = isDedicatedAiPage || ['/', '/splash', '/daftar', '/otp', '/buat-pin', '/login'].includes(pathname)
 
   useEffect(() => {
@@ -32,10 +32,14 @@ export default function PhoneMockup({ children }) {
       
       {/* Top Floating Bar on Desktop (Tools & Toggle) */}
       <div className="hidden sm:flex items-center justify-between w-full max-w-[420px] mb-2 px-2 text-xs text-[#4A6358]">
-        <div className="flex items-center gap-1.5 font-bold text-[#1A6B4A]">
+        <Link
+          to="/"
+          className="flex items-center gap-1.5 font-bold text-[#1A6B4A] hover:opacity-80 transition-opacity"
+          title="Klik untuk melihat Tampilan Awal Logo"
+        >
           <Sprout className="w-4 h-4 stroke-[2.2]" />
           <span>Patungan Bank</span>
-        </div>
+        </Link>
         <button
           onClick={() => setUseFrame(prev => !prev)}
           className="bg-white/80 hover:bg-white border border-[#C0CCC8] px-3 py-1 rounded-full text-[11px] font-semibold text-[#111F1A] active:scale-95 transition-all shadow-sm flex items-center gap-1.5"
