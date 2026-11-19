@@ -12,7 +12,7 @@ export default function PhoneMockup({ children }) {
   const { isAiModalOpen, openAiModal, closeAiModal } = useBankStore()
 
   const isDedicatedAiPage = pathname === '/ai-asisten'
-  const isDarkPage = ['/', '/login', '/splash'].includes(pathname)
+  const isDarkPage = ['/', '/splash'].includes(pathname)
   const hideFloatingAi = isDedicatedAiPage || ['/', '/splash', '/daftar', '/otp', '/buat-pin', '/login'].includes(pathname)
 
   useEffect(() => {
